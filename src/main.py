@@ -20,12 +20,12 @@ parser.addErrorListener(DiagnosticErrorListener())
 tree = parser.program()
 
 # First pass: register variables
-walker = ParseTreeWalker()
 listener = VariableDeclarationListener()
-walker.walk(listener, tree)
-
-# Second pass: evaluate
 visitor = EvalVisitor(listener.variables)
+
+walker = ParseTreeWalker()
+walker.walk(listener, tree)
+walker.walk(visitor, tree)
 
 # Redirect stdout to a file
 original_stdout = sys.stdout
