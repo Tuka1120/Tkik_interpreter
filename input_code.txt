@@ -1,0 +1,3 @@
+declare x as number
+set x to 3
+say "Hello, World!"
