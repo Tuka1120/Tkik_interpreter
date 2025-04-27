@@ -1,96 +1,152 @@
-now that this is new grammar file 
 grammar EnglishLang;
 
-// Parser Rules
 program: statement* EOF;
 
-statement
-    : variableDeclaration
-    | assignment
-    | loopStatement
-    | whileLoop
-    | printStatement
-    | expressionStatement
-    ;
+statement:
+    assignment SEMICOLON
+  | reassignment SEMICOLON
+  | funcDecl
+  | loopStatement
+  | displayDecl
+  | printStatement
+  | ifStatement
+  | operation SEMICOLON;
 
-variableDeclaration
-    : 'define' type IDENTIFIER 'as' expression
-    ;
+block: LEFT_BRACE statement* RIGHT_BRACE;
 
-assignment
-    : 'set' IDENTIFIER 'to' expression
-    ;
+assignment: typeName? IDENTIFIER ASSIGN expression;
 
-loopStatement
-    : 'repeat' 'from' NUMBER 'to' NUMBER ('step' NUMBER)? NEWLINE statement* 'end' 'repeat'
-    ;
+reassignment: IDENTIFIER ADD_TO expression 
+            | IDENTIFIER SUBTRACT_FROM expression
+            | IDENTIFIER TIMES expression
+            | IDENTIFIER DIVIDE_FROM expression;
 
-whileLoop
-    : 'repeat' 'while' expression NEWLINE statement* 'end' 'repeat'
-    ;
+expression:
+    numExpression
+  | boolExpression
+  | stringExpression
+  | IDENTIFIER
+  | NUMBER
+  | STRING
+  | funcCall
+  | indexedVar;
 
-printStatement
-    : 'print' expression
-    ;
+indexedVar: IDENTIFIER LEFT_BRACKET indexList RIGHT_BRACKET;
 
-expressionStatement
-    : expression
-    ;
+indexList: expression (COMMA expression)*;
 
-expression
-    : expression op=('*'|'/') expression
-    | expression op=('+'|'-') expression
-    | expression op=('>'|'>='|'<'|'<='|'=='|'!=') expression
-    | expression op=('and'|'or') expression
-    | 'not' expression
-    | '(' expression ')'
-    | IDENTIFIER
-    | NUMBER
-    | STRING
-    | BOOLEAN
-    ;
+numExpression: numExpression (PLUS|MINUS) term | term;
 
-type
-    : 'number'
-    | 'text'
-    | 'boolean'
-    ;
+term: term (MULTIPLY|DIVIDE|MODULO) factor
+    | factor;
 
-// Lexer Rules
-BOOLEAN: 'true' | 'false';
-STRING: '"' (~["\\\r\n])* '"';
-NUMBER: [0-9]+ ('.' [0-9]+)?;
-IDENTIFIER: [a-zA-Z_][a-zA-Z_0-9]*;
+factor: NUMBER
+      | IDENTIFIER
+      | LEFT_PAREN numExpression RIGHT_PAREN;
 
-// Operators
-PLUS: '+';
-MINUS: '-';
-MULTIPLY: '*';
-DIVIDE: '/';
-MODULO: '%';
+stringExpression: STRING (PLUS STRING)*;
 
-// Comparison
-EQUAL: '==';
-NOT_EQUAL: '!=';
-GREATER_THAN: '>';
-LESS_THAN: '<';
-GREATER_EQUAL: '>=';
-LESS_EQUAL: '<=';
+funcCall: IDENTIFIER LEFT_PAREN (expression (COMMA expression)*)? RIGHT_PAREN;
 
-// Logical
-AND: 'and';
-OR: 'or';
-NOT: 'not';
+boolExpression: numExpression comparisonOperator numExpression
+              | IDENTIFIER comparisonOperator IDENTIFIER
+              | boolValue
+              | NOT? LEFT_PAREN boolExpression RIGHT_PAREN;
 
-// Punctuation and Symbols
-LPAREN: '(';
-RPAREN: ')';
-COMMA: ',';
-COLON: ':';
-NEWLINE: ('\r'? '\n')+;
+comparisonOperator:
+    EQUAL
+  | NOT_EQUAL
+  | LESS_THAN
+  | GREATER_THAN
+  | LESS_EQUAL
+  | GREATER_EQUAL;
 
-// Comments
-LINE_COMMENT: '#' ~[\r\n]* -> skip;
+boolValue: TRUE_VALUE | FALSE_VALUE;
 
-// Whitespace
-WS: [ \t]+ -> skip;
+funcDecl: FUNC_INSTR typeName IDENTIFIER LEFT_PAREN parameters? RIGHT_PAREN block;
+
+parameters: typeName IDENTIFIER (COMMA typeName IDENTIFIER)*;
+
+ifStatement: IF_INSTR LEFT_PAREN boolExpression RIGHT_PAREN block (ELSE_INSTR block)?;
+
+loopStatement: forLoop | whileLoop;
+
+forLoop: FOR_INSTR LEFT_PAREN assignment SEMICOLON boolExpression SEMICOLON reassignment RIGHT_PAREN block;
+
+whileLoop: WHILE_INSTR LEFT_PAREN boolExpression RIGHT_PAREN block;
+
+displayDecl: DISPLAY_INSTR LEFT_PAREN expression RIGHT_PAREN SEMICOLON;
+
+printStatement: PRINT_INSTR LEFT_PAREN expression RIGHT_PAREN SEMICOLON;
+
+typeName: TYPE_STRING | TYPE_INT | TYPE_FLOAT | TYPE_BOOL | TYPE_MATRIX;
+
+operation: IDENTIFIER (INCREMENT | DECREMENT);
+
+// --------------- Operators and Assignment -------------------
+ADD_TO           : '+=';
+SUBTRACT_FROM    : '-=';
+TIMES            : '*=';
+DIVIDE_FROM      : '/=';
+
+INCREMENT        : '++';
+DECREMENT        : '--';
+
+// --------------- Data Types ------------------
+TYPE_STRING      : 'string';
+TYPE_INT         : 'int';
+TYPE_FLOAT       : 'float';
+TYPE_BOOL        : 'bool';
+TYPE_MATRIX      : 'matrix';
+
+// --------------- Logic Operators -------------------
+NOT             : '!';
+
+// --------------- Reserved Keywords ------------------
+TRUE_VALUE      : 'true';
+FALSE_VALUE     : 'false';
+IF_INSTR        : 'if';
+ELSE_INSTR      : 'else';
+FOR_INSTR       : 'for';
+WHILE_INSTR     : 'while';
+FUNC_INSTR      : 'func';
+DISPLAY_INSTR   : 'display';
+PRINT_INSTR     : 'print';
+RETURN_INSTR    : 'return';
+PLOT_INSTR      : 'plot';
+
+// --------------- Special Characters -------------
+SEMICOLON       : ';';
+COMMA           : ',';
+ASSIGN          : '=';
+
+PLUS            : '+';
+MINUS           : '-';
+MULTIPLY        : '*';
+DIVIDE          : '/';
+MODULO          : '%';
+
+EQUAL           : '==';
+NOT_EQUAL       : '!=';
+LESS_THAN       : '<';
+GREATER_THAN    : '>';
+LESS_EQUAL      : '<=';
+GREATER_EQUAL   : '>=';
+
+LEFT_PAREN      : '(';
+RIGHT_PAREN     : ')';
+LEFT_BRACKET    : '[';
+RIGHT_BRACKET   : ']';
+LEFT_BRACE      : '{';
+RIGHT_BRACE     : '}';
+
+// --------------- Identifiers and Numbers ----------------
+NUMBER: [0-9]+('.'[0-9]+)?;
+STRING: '"' (ESC | ~["\\])* '"';
+fragment ESC: '\\' ["\\/bfnrt];
+
+IDENTIFIER      : [a-zA-Z_][a-zA-Z0-9_]*;
+
+WHITE_SPACE     : [ \t\r\n]+ -> skip;
+
+COMMENT         : '//' ~[\r\n]* -> skip;

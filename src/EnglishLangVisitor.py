@@ -10,28 +10,22 @@ else:
 class EnglishLangVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by EnglishLangParser#program.
-    def visitProgram(self, ctx: EnglishLangParser.ProgramContext):
-        for stmt in ctx.statement():
-            self.visit(stmt)
+    def visitProgram(self, ctx:EnglishLangParser.ProgramContext):
+        return self.visitChildren(ctx)
+
 
     # Visit a parse tree produced by EnglishLangParser#statement.
-    def visitStatement(self, ctx: EnglishLangParser.StatementContext):
-        if ctx.variableDeclaration():
-            return self.visit(ctx.variableDeclaration())
-        elif ctx.assignment():
-            return self.visit(ctx.assignment())
-        elif ctx.printStatement():
-            return self.visit(ctx.printStatement())
-
+    def visitStatement(self, ctx:EnglishLangParser.StatementContext):
+        return self.visitChildren(ctx)
 
 
     # Visit a parse tree produced by EnglishLangParser#varDecl.
-    def visitVariableDeclaration(self, ctx:EnglishLangParser.VariableDeclarationContext):
+    def visitVarDecl(self, ctx:EnglishLangParser.VariableDeclarationContext):
         return self.visitChildren(ctx)
 
 
     # Visit a parse tree produced by EnglishLangParser#assignStmt.
-    def visitAssignment(self, ctx:EnglishLangParser.AssignmentContext):
+    def visitAssignStmt(self, ctx:EnglishLangParser.AssignmentContext):
         return self.visitChildren(ctx)
 
 
