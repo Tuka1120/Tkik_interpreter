@@ -1,13 +1,13 @@
 from EnglishLangParser import EnglishLangParser
-from EnglishLangParserListener import EnglishLangParserListener
+from EnglishLangListener import EnglishLangListener
 
-class VariableCollector(EnglishLangParserListener):
+class VariableDeclarationListener(EnglishLangListener):
     def __init__(self):
         self.variables = {}
 
-    def enterDeclareStmt(self, ctx: EnglishLangParser.DeclareStmtContext):
-        var_name = ctx.ID().getText()
-        var_type = ctx.type().getText()
+    def enterVariableDeclaration(self, ctx: EnglishLangParser.VariableDeclarationContext):
+        var_name = ctx.IDENTIFIER().getText()
+        var_type = ctx.type_().getText()
 
         if var_name in self.variables:
             raise Exception(f"Variable '{var_name}' redeclared.")

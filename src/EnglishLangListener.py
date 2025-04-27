@@ -26,39 +26,57 @@ class EnglishLangListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by EnglishLangParser#varDecl.
-    def enterVarDecl(self, ctx:EnglishLangParser.VarDeclContext):
+    # Enter a parse tree produced by EnglishLangParser#variableDeclaration.
+    def enterVariableDeclaration(self, ctx:EnglishLangParser.VariableDeclarationContext):
         pass
 
-    # Exit a parse tree produced by EnglishLangParser#varDecl.
-    def exitVarDecl(self, ctx:EnglishLangParser.VarDeclContext):
-        pass
-
-
-    # Enter a parse tree produced by EnglishLangParser#assignStmt.
-    def enterAssignStmt(self, ctx:EnglishLangParser.AssignStmtContext):
-        pass
-
-    # Exit a parse tree produced by EnglishLangParser#assignStmt.
-    def exitAssignStmt(self, ctx:EnglishLangParser.AssignStmtContext):
+    # Exit a parse tree produced by EnglishLangParser#variableDeclaration.
+    def exitVariableDeclaration(self, ctx:EnglishLangParser.VariableDeclarationContext):
         pass
 
 
-    # Enter a parse tree produced by EnglishLangParser#printStmt.
-    def enterPrintStmt(self, ctx:EnglishLangParser.PrintStmtContext):
+    # Enter a parse tree produced by EnglishLangParser#assignment.
+    def enterAssignment(self, ctx:EnglishLangParser.AssignmentContext):
         pass
 
-    # Exit a parse tree produced by EnglishLangParser#printStmt.
-    def exitPrintStmt(self, ctx:EnglishLangParser.PrintStmtContext):
+    # Exit a parse tree produced by EnglishLangParser#assignment.
+    def exitAssignment(self, ctx:EnglishLangParser.AssignmentContext):
         pass
 
 
-    # Enter a parse tree produced by EnglishLangParser#type.
-    def enterType(self, ctx:EnglishLangParser.TypeContext):
+    # Enter a parse tree produced by EnglishLangParser#loopStatement.
+    def enterLoopStatement(self, ctx:EnglishLangParser.LoopStatementContext):
         pass
 
-    # Exit a parse tree produced by EnglishLangParser#type.
-    def exitType(self, ctx:EnglishLangParser.TypeContext):
+    # Exit a parse tree produced by EnglishLangParser#loopStatement.
+    def exitLoopStatement(self, ctx:EnglishLangParser.LoopStatementContext):
+        pass
+
+
+    # Enter a parse tree produced by EnglishLangParser#whileLoop.
+    def enterWhileLoop(self, ctx:EnglishLangParser.WhileLoopContext):
+        pass
+
+    # Exit a parse tree produced by EnglishLangParser#whileLoop.
+    def exitWhileLoop(self, ctx:EnglishLangParser.WhileLoopContext):
+        pass
+
+
+    # Enter a parse tree produced by EnglishLangParser#printStatement.
+    def enterPrintStatement(self, ctx:EnglishLangParser.PrintStatementContext):
+        pass
+
+    # Exit a parse tree produced by EnglishLangParser#printStatement.
+    def exitPrintStatement(self, ctx:EnglishLangParser.PrintStatementContext):
+        pass
+
+
+    # Enter a parse tree produced by EnglishLangParser#expressionStatement.
+    def enterExpressionStatement(self, ctx:EnglishLangParser.ExpressionStatementContext):
+        pass
+
+    # Exit a parse tree produced by EnglishLangParser#expressionStatement.
+    def exitExpressionStatement(self, ctx:EnglishLangParser.ExpressionStatementContext):
         pass
 
 
@@ -70,22 +88,67 @@ class EnglishLangListener(ParseTreeListener):
     def exitExpression(self, ctx:EnglishLangParser.ExpressionContext):
         pass
 
-# Add this to EnglishLangListener.py
-class VariableDeclarationListener(EnglishLangListener):
-    
-    def __init__(self):
-        # Initialize the dictionary to store variable names and types
-        self.variables = {}
 
-    def enterVarDecl(self, ctx: EnglishLangParser.VarDeclContext):
-        # Extract variable name and type from the context
-        var_name = ctx.ID().getText()  # Get the variable name (ID)
-        var_type = ctx.type().getText()  # Get the type (either 'number' or 'boolean')
-        
-        # Store the variable and its type in the dictionary
-        self.variables[var_name] = var_type
-        print(f"Declared variable {var_name} of type {var_type}")
+    # Enter a parse tree produced by EnglishLangParser#logicExpr.
+    def enterLogicExpr(self, ctx:EnglishLangParser.LogicExprContext):
+        pass
+
+    # Exit a parse tree produced by EnglishLangParser#logicExpr.
+    def exitLogicExpr(self, ctx:EnglishLangParser.LogicExprContext):
+        pass
 
 
+    # Enter a parse tree produced by EnglishLangParser#compareExpr.
+    def enterCompareExpr(self, ctx:EnglishLangParser.CompareExprContext):
+        pass
+
+    # Exit a parse tree produced by EnglishLangParser#compareExpr.
+    def exitCompareExpr(self, ctx:EnglishLangParser.CompareExprContext):
+        pass
+
+
+    # Enter a parse tree produced by EnglishLangParser#addExpr.
+    def enterAddExpr(self, ctx:EnglishLangParser.AddExprContext):
+        pass
+
+    # Exit a parse tree produced by EnglishLangParser#addExpr.
+    def exitAddExpr(self, ctx:EnglishLangParser.AddExprContext):
+        pass
+
+
+    # Enter a parse tree produced by EnglishLangParser#mulExpr.
+    def enterMulExpr(self, ctx:EnglishLangParser.MulExprContext):
+        pass
+
+    # Exit a parse tree produced by EnglishLangParser#mulExpr.
+    def exitMulExpr(self, ctx:EnglishLangParser.MulExprContext):
+        pass
+
+
+    # Enter a parse tree produced by EnglishLangParser#unaryExpr.
+    def enterUnaryExpr(self, ctx:EnglishLangParser.UnaryExprContext):
+        pass
+
+    # Exit a parse tree produced by EnglishLangParser#unaryExpr.
+    def exitUnaryExpr(self, ctx:EnglishLangParser.UnaryExprContext):
+        pass
+
+
+    # Enter a parse tree produced by EnglishLangParser#primaryExpr.
+    def enterPrimaryExpr(self, ctx:EnglishLangParser.PrimaryExprContext):
+        pass
+
+    # Exit a parse tree produced by EnglishLangParser#primaryExpr.
+    def exitPrimaryExpr(self, ctx:EnglishLangParser.PrimaryExprContext):
+        pass
+
+
+    # Enter a parse tree produced by EnglishLangParser#type.
+    def enterType(self, ctx:EnglishLangParser.TypeContext):
+        pass
+
+    # Exit a parse tree produced by EnglishLangParser#type.
+    def exitType(self, ctx:EnglishLangParser.TypeContext):
+        pass
 
 del EnglishLangParser
