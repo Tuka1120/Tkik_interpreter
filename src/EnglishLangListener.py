@@ -35,6 +35,15 @@ class EnglishLangListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by EnglishLangParser#declaration.
+    def enterDeclaration(self, ctx:EnglishLangParser.DeclarationContext):
+        pass
+
+    # Exit a parse tree produced by EnglishLangParser#declaration.
+    def exitDeclaration(self, ctx:EnglishLangParser.DeclarationContext):
+        pass
+
+
     # Enter a parse tree produced by EnglishLangParser#assignment.
     def enterAssignment(self, ctx:EnglishLangParser.AssignmentContext):
         pass

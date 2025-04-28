@@ -35,25 +35,30 @@ class Interpreter:
                 self.handle_assignment(child)
             elif isinstance(child, EnglishLangParser.PrintStatementContext):
                 self.handle_print(child, output)
-            elif isinstance(child, EnglishLangParser.FuncDeclContext):
-                self.handle_func_decl(child)
+            elif isinstance(child, EnglishLangParser.DeclarationContext):
+                self.handle_declaration(child)
             # Add more conditions as necessary based on your grammar
             else:
                 self.walk(child, output)
 
-    def handle_assignment(self, ctx):
-        # Handle variable assignments
+    def handle_declaration(self, ctx):
         var_name = ctx.IDENTIFIER().getText()
-        var_type = ctx.typeName().getText() if ctx.typeName() else "unknown"
-
-        # Get the assigned value (it should be a number or an expression)
-        value = self.evaluate_expression(ctx.expression())
+        var_type = ctx.typeName().getText()
 
         if var_name in self.variables:
-            raise Exception(f"Variable '{var_name}' redeclared.")
+            raise Exception(f"Variable '{var_name}' already declared.")
 
-        # Store the variable and its value
-        self.variables[var_name] = value
+        self.variables[var_name] = {"type": var_type, "value": None}  # Initialize with None or a default value based on var_type
+
+    def handle_assignment(self, ctx):
+        var_name = ctx.IDENTIFIER().getText()
+        expr = ctx.expression()
+        value = self.evaluate_expression(expr)
+
+        if var_name not in self.variables:
+            raise Exception(f"Variable '{var_name}' is not declared.")
+
+        self.variables[var_name]["value"] = value
 
     def evaluate_expression(self, expr):
         # Evaluate simple expressions (like a number or variable)
@@ -90,13 +95,6 @@ class Interpreter:
                 output.write(f"{expression.getText()}\n")
         else:
             output.write("Error: Invalid print expression\n")
-
-    def handle_func_decl(self, ctx):
-        # Handle function declarations
-        func_name = ctx.IDENTIFIER().getText()
-        # You can add more logic to process function declarations here
-
-    # Add more handlers for other grammar rules if necessary
 
 # Run the interpreter
 if __name__ == "__main__":

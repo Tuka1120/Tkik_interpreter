@@ -1,3 +1,8 @@
-int x = 10;
+define x be int;
+set x to 10;
+
+define message be string;
+set message to "Hello World";
+
 print(x);
-print("Hello World!");
+print(message);

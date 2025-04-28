@@ -4,6 +4,7 @@ program: statement* EOF;
 
 statement:
     assignment SEMICOLON
+  | declaration SEMICOLON
   | reassignment SEMICOLON
   | funcDecl
   | loopStatement
@@ -14,8 +15,13 @@ statement:
 
 block: LEFT_BRACE statement* RIGHT_BRACE;
 
-assignment: typeName? IDENTIFIER ASSIGN expression;
+// Declaration: Define x be int;
+declaration: DEFINE IDENTIFIER BE typeName;
 
+// Assignment: Set x to value;
+assignment: SET IDENTIFIER ASSIGN expression;
+
+// Old reassignment remains
 reassignment: IDENTIFIER ADD_TO expression 
             | IDENTIFIER SUBTRACT_FROM expression
             | IDENTIFIER TIMES expression
@@ -99,6 +105,12 @@ TYPE_FLOAT       : 'float';
 TYPE_BOOL        : 'bool';
 TYPE_MATRIX      : 'matrix';
 
+// --------------- New Keywords for "Natural" Language ------------------
+DEFINE           : 'define';
+BE               : 'be';
+SET              : 'set';
+ASSIGN           : 'to';
+
 // --------------- Logic Operators -------------------
 NOT             : '!';
 
@@ -118,7 +130,6 @@ PLOT_INSTR      : 'plot';
 // --------------- Special Characters -------------
 SEMICOLON       : ';';
 COMMA           : ',';
-ASSIGN          : '=';
 
 PLUS            : '+';
 MINUS           : '-';
