@@ -1,8 +1,5 @@
-define x be int;
-set x to 10;
-
-define message be string;
-set message to "Hello World";
-
-print(x);
-print(message);
+Start Program
+    Set x to 4 int
+    Set y to 5 int
+    Display x, y
+End Program
