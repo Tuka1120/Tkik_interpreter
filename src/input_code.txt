@@ -1,5 +1,5 @@
 Start Program
     Set x to 4 int
     Set y to 5 int
-    Display y + x * 2
+    Display (y + x * 3) * 2
 End Program
