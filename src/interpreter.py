@@ -25,7 +25,7 @@ class Interpreter(EnglishLangParserVisitor):
         name = ctx.IDENTIFIER().getText()
         value = self.visit(ctx.expression())
         self.env.variables[name] = value
-        return None  # Don't return value to avoid printing
+        return None 
 
     def visitAssignment(self, ctx):
         name = ctx.IDENTIFIER().getText()
@@ -51,7 +51,7 @@ class Interpreter(EnglishLangParserVisitor):
     def visitDisplayStatement(self, ctx):
         expressions = ctx.expression()
         results = [self.visit(expr) for expr in expressions]
-        print("DEBUG: Displaying", results)  # <- add this
+        print("DEBUG: Displaying", results)  
         return ' '.join(str(r) for r in results)
 
 

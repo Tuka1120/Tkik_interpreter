@@ -19,15 +19,12 @@ def main():
     with open(input_file_path, 'r', encoding='utf-8') as f:
         code = f.read()
 
-    # Create input stream for ANTLR
     input_stream = InputStream(code)
 
-    # Initialize lexer and parser
     lexer = EnglishLangLexer(input_stream)
     token_stream = CommonTokenStream(lexer)
     parser = EnglishLangParser(token_stream)
 
-    # Attach custom error listener
     parser.removeErrorListeners()
     parser.addErrorListener(EnglishLangErrorListener())
 
@@ -39,7 +36,6 @@ def main():
         print(e)
         return
     
-    # Ensure output is a list of lines or a single string
     with open(output_path, 'w', encoding='utf-8') as out_file:
         if isinstance(output_lines, list):
             out_file.write("\n".join(str(line) for line in output_lines))
