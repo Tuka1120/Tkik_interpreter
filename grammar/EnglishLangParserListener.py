@@ -26,12 +26,84 @@ class EnglishLangParserListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by EnglishLangParser#loopStatements.
+    def enterLoopStatements(self, ctx:EnglishLangParser.LoopStatementsContext):
+        pass
+
+    # Exit a parse tree produced by EnglishLangParser#loopStatements.
+    def exitLoopStatements(self, ctx:EnglishLangParser.LoopStatementsContext):
+        pass
+
+
     # Enter a parse tree produced by EnglishLangParser#variableDeclaration.
     def enterVariableDeclaration(self, ctx:EnglishLangParser.VariableDeclarationContext):
         pass
 
     # Exit a parse tree produced by EnglishLangParser#variableDeclaration.
     def exitVariableDeclaration(self, ctx:EnglishLangParser.VariableDeclarationContext):
+        pass
+
+
+    # Enter a parse tree produced by EnglishLangParser#matrixExpression.
+    def enterMatrixExpression(self, ctx:EnglishLangParser.MatrixExpressionContext):
+        pass
+
+    # Exit a parse tree produced by EnglishLangParser#matrixExpression.
+    def exitMatrixExpression(self, ctx:EnglishLangParser.MatrixExpressionContext):
+        pass
+
+
+    # Enter a parse tree produced by EnglishLangParser#matrixAtom.
+    def enterMatrixAtom(self, ctx:EnglishLangParser.MatrixAtomContext):
+        pass
+
+    # Exit a parse tree produced by EnglishLangParser#matrixAtom.
+    def exitMatrixAtom(self, ctx:EnglishLangParser.MatrixAtomContext):
+        pass
+
+
+    # Enter a parse tree produced by EnglishLangParser#matrixConstruction.
+    def enterMatrixConstruction(self, ctx:EnglishLangParser.MatrixConstructionContext):
+        pass
+
+    # Exit a parse tree produced by EnglishLangParser#matrixConstruction.
+    def exitMatrixConstruction(self, ctx:EnglishLangParser.MatrixConstructionContext):
+        pass
+
+
+    # Enter a parse tree produced by EnglishLangParser#row.
+    def enterRow(self, ctx:EnglishLangParser.RowContext):
+        pass
+
+    # Exit a parse tree produced by EnglishLangParser#row.
+    def exitRow(self, ctx:EnglishLangParser.RowContext):
+        pass
+
+
+    # Enter a parse tree produced by EnglishLangParser#value.
+    def enterValue(self, ctx:EnglishLangParser.ValueContext):
+        pass
+
+    # Exit a parse tree produced by EnglishLangParser#value.
+    def exitValue(self, ctx:EnglishLangParser.ValueContext):
+        pass
+
+
+    # Enter a parse tree produced by EnglishLangParser#stringExpression.
+    def enterStringExpression(self, ctx:EnglishLangParser.StringExpressionContext):
+        pass
+
+    # Exit a parse tree produced by EnglishLangParser#stringExpression.
+    def exitStringExpression(self, ctx:EnglishLangParser.StringExpressionContext):
+        pass
+
+
+    # Enter a parse tree produced by EnglishLangParser#expression.
+    def enterExpression(self, ctx:EnglishLangParser.ExpressionContext):
+        pass
+
+    # Exit a parse tree produced by EnglishLangParser#expression.
+    def exitExpression(self, ctx:EnglishLangParser.ExpressionContext):
         pass
 
 
@@ -62,30 +134,21 @@ class EnglishLangParserListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by EnglishLangParser#builtInFunctions.
+    def enterBuiltInFunctions(self, ctx:EnglishLangParser.BuiltInFunctionsContext):
+        pass
+
+    # Exit a parse tree produced by EnglishLangParser#builtInFunctions.
+    def exitBuiltInFunctions(self, ctx:EnglishLangParser.BuiltInFunctionsContext):
+        pass
+
+
     # Enter a parse tree produced by EnglishLangParser#returnStatement.
     def enterReturnStatement(self, ctx:EnglishLangParser.ReturnStatementContext):
         pass
 
     # Exit a parse tree produced by EnglishLangParser#returnStatement.
     def exitReturnStatement(self, ctx:EnglishLangParser.ReturnStatementContext):
-        pass
-
-
-    # Enter a parse tree produced by EnglishLangParser#displayStatement.
-    def enterDisplayStatement(self, ctx:EnglishLangParser.DisplayStatementContext):
-        pass
-
-    # Exit a parse tree produced by EnglishLangParser#displayStatement.
-    def exitDisplayStatement(self, ctx:EnglishLangParser.DisplayStatementContext):
-        pass
-
-
-    # Enter a parse tree produced by EnglishLangParser#displayPart.
-    def enterDisplayPart(self, ctx:EnglishLangParser.DisplayPartContext):
-        pass
-
-    # Exit a parse tree produced by EnglishLangParser#displayPart.
-    def exitDisplayPart(self, ctx:EnglishLangParser.DisplayPartContext):
         pass
 
 
@@ -98,30 +161,57 @@ class EnglishLangParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by EnglishLangParser#whileStatement.
-    def enterWhileStatement(self, ctx:EnglishLangParser.WhileStatementContext):
+    # Enter a parse tree produced by EnglishLangParser#loopIfStatement.
+    def enterLoopIfStatement(self, ctx:EnglishLangParser.LoopIfStatementContext):
         pass
 
-    # Exit a parse tree produced by EnglishLangParser#whileStatement.
-    def exitWhileStatement(self, ctx:EnglishLangParser.WhileStatementContext):
-        pass
-
-
-    # Enter a parse tree produced by EnglishLangParser#forEachStatement.
-    def enterForEachStatement(self, ctx:EnglishLangParser.ForEachStatementContext):
-        pass
-
-    # Exit a parse tree produced by EnglishLangParser#forEachStatement.
-    def exitForEachStatement(self, ctx:EnglishLangParser.ForEachStatementContext):
+    # Exit a parse tree produced by EnglishLangParser#loopIfStatement.
+    def exitLoopIfStatement(self, ctx:EnglishLangParser.LoopIfStatementContext):
         pass
 
 
-    # Enter a parse tree produced by EnglishLangParser#parameterList.
-    def enterParameterList(self, ctx:EnglishLangParser.ParameterListContext):
+    # Enter a parse tree produced by EnglishLangParser#loopStatement.
+    def enterLoopStatement(self, ctx:EnglishLangParser.LoopStatementContext):
         pass
 
-    # Exit a parse tree produced by EnglishLangParser#parameterList.
-    def exitParameterList(self, ctx:EnglishLangParser.ParameterListContext):
+    # Exit a parse tree produced by EnglishLangParser#loopStatement.
+    def exitLoopStatement(self, ctx:EnglishLangParser.LoopStatementContext):
+        pass
+
+
+    # Enter a parse tree produced by EnglishLangParser#forLoop.
+    def enterForLoop(self, ctx:EnglishLangParser.ForLoopContext):
+        pass
+
+    # Exit a parse tree produced by EnglishLangParser#forLoop.
+    def exitForLoop(self, ctx:EnglishLangParser.ForLoopContext):
+        pass
+
+
+    # Enter a parse tree produced by EnglishLangParser#whileLoop.
+    def enterWhileLoop(self, ctx:EnglishLangParser.WhileLoopContext):
+        pass
+
+    # Exit a parse tree produced by EnglishLangParser#whileLoop.
+    def exitWhileLoop(self, ctx:EnglishLangParser.WhileLoopContext):
+        pass
+
+
+    # Enter a parse tree produced by EnglishLangParser#displayStatement.
+    def enterDisplayStatement(self, ctx:EnglishLangParser.DisplayStatementContext):
+        pass
+
+    # Exit a parse tree produced by EnglishLangParser#displayStatement.
+    def exitDisplayStatement(self, ctx:EnglishLangParser.DisplayStatementContext):
+        pass
+
+
+    # Enter a parse tree produced by EnglishLangParser#parameter.
+    def enterParameter(self, ctx:EnglishLangParser.ParameterContext):
+        pass
+
+    # Exit a parse tree produced by EnglishLangParser#parameter.
+    def exitParameter(self, ctx:EnglishLangParser.ParameterContext):
         pass
 
 
@@ -134,15 +224,6 @@ class EnglishLangParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by EnglishLangParser#argumentList.
-    def enterArgumentList(self, ctx:EnglishLangParser.ArgumentListContext):
-        pass
-
-    # Exit a parse tree produced by EnglishLangParser#argumentList.
-    def exitArgumentList(self, ctx:EnglishLangParser.ArgumentListContext):
-        pass
-
-
     # Enter a parse tree produced by EnglishLangParser#block.
     def enterBlock(self, ctx:EnglishLangParser.BlockContext):
         pass
@@ -152,21 +233,57 @@ class EnglishLangParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by EnglishLangParser#expression.
-    def enterExpression(self, ctx:EnglishLangParser.ExpressionContext):
+    # Enter a parse tree produced by EnglishLangParser#numExpression.
+    def enterNumExpression(self, ctx:EnglishLangParser.NumExpressionContext):
         pass
 
-    # Exit a parse tree produced by EnglishLangParser#expression.
-    def exitExpression(self, ctx:EnglishLangParser.ExpressionContext):
+    # Exit a parse tree produced by EnglishLangParser#numExpression.
+    def exitNumExpression(self, ctx:EnglishLangParser.NumExpressionContext):
         pass
 
 
-    # Enter a parse tree produced by EnglishLangParser#condition.
-    def enterCondition(self, ctx:EnglishLangParser.ConditionContext):
+    # Enter a parse tree produced by EnglishLangParser#term.
+    def enterTerm(self, ctx:EnglishLangParser.TermContext):
         pass
 
-    # Exit a parse tree produced by EnglishLangParser#condition.
-    def exitCondition(self, ctx:EnglishLangParser.ConditionContext):
+    # Exit a parse tree produced by EnglishLangParser#term.
+    def exitTerm(self, ctx:EnglishLangParser.TermContext):
+        pass
+
+
+    # Enter a parse tree produced by EnglishLangParser#factor.
+    def enterFactor(self, ctx:EnglishLangParser.FactorContext):
+        pass
+
+    # Exit a parse tree produced by EnglishLangParser#factor.
+    def exitFactor(self, ctx:EnglishLangParser.FactorContext):
+        pass
+
+
+    # Enter a parse tree produced by EnglishLangParser#operation.
+    def enterOperation(self, ctx:EnglishLangParser.OperationContext):
+        pass
+
+    # Exit a parse tree produced by EnglishLangParser#operation.
+    def exitOperation(self, ctx:EnglishLangParser.OperationContext):
+        pass
+
+
+    # Enter a parse tree produced by EnglishLangParser#reassignment.
+    def enterReassignment(self, ctx:EnglishLangParser.ReassignmentContext):
+        pass
+
+    # Exit a parse tree produced by EnglishLangParser#reassignment.
+    def exitReassignment(self, ctx:EnglishLangParser.ReassignmentContext):
+        pass
+
+
+    # Enter a parse tree produced by EnglishLangParser#boolExpression.
+    def enterBoolExpression(self, ctx:EnglishLangParser.BoolExpressionContext):
+        pass
+
+    # Exit a parse tree produced by EnglishLangParser#boolExpression.
+    def exitBoolExpression(self, ctx:EnglishLangParser.BoolExpressionContext):
         pass
 
 

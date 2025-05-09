@@ -1,42 +1,112 @@
-import sys
-import os
+
 from antlr4 import *
-
-grammar_path = os.path.join(os.path.dirname(__file__), '..', 'grammar')
-sys.path.append(grammar_path)
-
+from EnglishLangLexer import EnglishLangLexer
 from EnglishLangParser import EnglishLangParser
-from EnglishLangParserVisitor import EnglishLangParserVisitor as EnglishLangVisitor
+from EnglishLangParserVisitor import EnglishLangParserVisitor
 
-
-class Interpreter(EnglishLangVisitor):
+class Environment:
     def __init__(self):
         self.variables = {}
-        self.output_lines = []
+        self.functions = {}
 
-    def visitProgram(self, ctx: EnglishLangParser.ProgramContext):
-        for statement in ctx.statement():
-            self.visit(statement)
-        return self.output_lines
+class Interpreter(EnglishLangParserVisitor):
+    def __init__(self):
+        self.env = Environment()
 
-    def visitVariableDeclaration(self, ctx: EnglishLangParser.VariableDeclarationContext):
+    def visitProgram(self, ctx):
+        output_lines = []
+        for stmt in ctx.statement():
+            result = self.visit(stmt)
+            if result is not None:
+                output_lines.append(str(result))  # Only Display returns something
+        return output_lines
+
+    def visitVariableDeclaration(self, ctx):
         name = ctx.IDENTIFIER().getText()
         value = self.visit(ctx.expression())
-        self.variables[name] = value
+        self.env.variables[name] = value
+        return None  # Don't return value to avoid printing
 
-    def visitDisplayStatement(self, ctx: EnglishLangParser.DisplayStatementContext):
-        values = []
-        for part in ctx.displayPart():
-            identifier = part.IDENTIFIER().getText()
-            value = self.variables.get(identifier, f"<undefined {identifier}>")
-            values.append(str(value))
-        self.output_lines.append(" ".join(values))
+    def visitAssignment(self, ctx):
+        name = ctx.IDENTIFIER().getText()
+        value = self.visit(ctx.expression())
+        self.global_scope[name] = value
+        return None 
 
-    def visitExpression(self, ctx: EnglishLangParser.ExpressionContext):
-        if ctx.NUMBER():
-            return int(ctx.NUMBER().getText())
-        elif ctx.IDENTIFIER():
-            return self.variables.get(ctx.IDENTIFIER().getText(), 0)
-        # Extend this later to handle +, -, *, / etc.
+    def visitReassignment(self, ctx):
+        name = ctx.IDENTIFIER().getText()
+        if name not in self.env.variables:
+            raise Exception(f"Variable '{name}' not defined.")
+        value = self.visit(ctx.numExpression())
+        if ctx.ADD_TO():
+            self.env.variables[name] += value
+        elif ctx.SUBTRACT_FROM():
+            self.env.variables[name] -= value
+        elif ctx.TIMES():
+            self.env.variables[name] *= value
+        elif ctx.DIVIDE_FROM():
+            self.env.variables[name] /= value
+        return self.env.variables[name]
+
+    def visitDisplayStatement(self, ctx):
+        expressions = ctx.expression()
+        results = [self.visit(expr) for expr in expressions]
+        print("DEBUG: Displaying", results)  # <- add this
+        return ' '.join(str(r) for r in results)
+
+
+    def visitNumExpression(self, ctx):
+        if ctx.getChildCount() == 3:
+            left = self.visit(ctx.getChild(0))
+            op = ctx.getChild(1).getText()
+            right = self.visit(ctx.getChild(2))
+            if op == '+':
+                return left + right
+            elif op == '-':
+                return left - right
+        return self.visit(ctx.getChild(0))
     
- 
+    def visitTerm(self, ctx):
+        if ctx.getChildCount() == 3:
+            left = self.visit(ctx.getChild(0))
+            op = ctx.getChild(1).getText()
+            right = self.visit(ctx.getChild(2))
+            if op == '*':
+                return left * right
+            elif op == '/':
+                return left / right
+            elif op == '%':
+                return left % right
+        return self.visit(ctx.getChild(0))
+
+    def visitFactor(self, ctx):
+        if ctx.NUMBER():
+            return float(ctx.NUMBER().getText())
+        elif ctx.IDENTIFIER():
+            name = ctx.IDENTIFIER().getText()
+            return self.env.variables.get(name, 0)
+        elif ctx.numExpression():
+            return self.visit(ctx.numExpression())
+        return 0
+
+    def evaluateBinaryOp(self, left, right, op):
+        if op == '+': return left + right
+        elif op == '-': return left - right
+        elif op == '*': return left * right
+        elif op == '/': return left / right
+        elif op == '%': return left % right
+        else: raise Exception(f"Unknown operator {op}")
+
+    def visitFunctionCall(self, ctx):
+        name = ctx.IDENTIFIER().getText()
+        print(f"Function '{name}' called (args ignored in basic interpreter).")
+
+    def visitExpression(self, ctx):
+        if ctx.numExpression():
+            return self.visit(ctx.numExpression())
+        elif ctx.STRING():
+            return ctx.STRING().getText().strip('"')
+        elif ctx.IDENTIFIER():
+            name = ctx.IDENTIFIER().getText()
+            return self.env.variables.get(name, 0)
+        return None

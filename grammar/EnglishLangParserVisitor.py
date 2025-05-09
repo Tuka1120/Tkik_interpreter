@@ -19,8 +19,48 @@ class EnglishLangParserVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by EnglishLangParser#loopStatements.
+    def visitLoopStatements(self, ctx:EnglishLangParser.LoopStatementsContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by EnglishLangParser#variableDeclaration.
     def visitVariableDeclaration(self, ctx:EnglishLangParser.VariableDeclarationContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by EnglishLangParser#matrixExpression.
+    def visitMatrixExpression(self, ctx:EnglishLangParser.MatrixExpressionContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by EnglishLangParser#matrixAtom.
+    def visitMatrixAtom(self, ctx:EnglishLangParser.MatrixAtomContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by EnglishLangParser#matrixConstruction.
+    def visitMatrixConstruction(self, ctx:EnglishLangParser.MatrixConstructionContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by EnglishLangParser#row.
+    def visitRow(self, ctx:EnglishLangParser.RowContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by EnglishLangParser#value.
+    def visitValue(self, ctx:EnglishLangParser.ValueContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by EnglishLangParser#stringExpression.
+    def visitStringExpression(self, ctx:EnglishLangParser.StringExpressionContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by EnglishLangParser#expression.
+    def visitExpression(self, ctx:EnglishLangParser.ExpressionContext):
         return self.visitChildren(ctx)
 
 
@@ -39,18 +79,13 @@ class EnglishLangParserVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by EnglishLangParser#builtInFunctions.
+    def visitBuiltInFunctions(self, ctx:EnglishLangParser.BuiltInFunctionsContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by EnglishLangParser#returnStatement.
     def visitReturnStatement(self, ctx:EnglishLangParser.ReturnStatementContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by EnglishLangParser#displayStatement.
-    def visitDisplayStatement(self, ctx:EnglishLangParser.DisplayStatementContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by EnglishLangParser#displayPart.
-    def visitDisplayPart(self, ctx:EnglishLangParser.DisplayPartContext):
         return self.visitChildren(ctx)
 
 
@@ -59,18 +94,33 @@ class EnglishLangParserVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by EnglishLangParser#whileStatement.
-    def visitWhileStatement(self, ctx:EnglishLangParser.WhileStatementContext):
+    # Visit a parse tree produced by EnglishLangParser#loopIfStatement.
+    def visitLoopIfStatement(self, ctx:EnglishLangParser.LoopIfStatementContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by EnglishLangParser#forEachStatement.
-    def visitForEachStatement(self, ctx:EnglishLangParser.ForEachStatementContext):
+    # Visit a parse tree produced by EnglishLangParser#loopStatement.
+    def visitLoopStatement(self, ctx:EnglishLangParser.LoopStatementContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by EnglishLangParser#parameterList.
-    def visitParameterList(self, ctx:EnglishLangParser.ParameterListContext):
+    # Visit a parse tree produced by EnglishLangParser#forLoop.
+    def visitForLoop(self, ctx:EnglishLangParser.ForLoopContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by EnglishLangParser#whileLoop.
+    def visitWhileLoop(self, ctx:EnglishLangParser.WhileLoopContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by EnglishLangParser#displayStatement.
+    def visitDisplayStatement(self, ctx:EnglishLangParser.DisplayStatementContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by EnglishLangParser#parameter.
+    def visitParameter(self, ctx:EnglishLangParser.ParameterContext):
         return self.visitChildren(ctx)
 
 
@@ -79,23 +129,38 @@ class EnglishLangParserVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by EnglishLangParser#argumentList.
-    def visitArgumentList(self, ctx:EnglishLangParser.ArgumentListContext):
-        return self.visitChildren(ctx)
-
-
     # Visit a parse tree produced by EnglishLangParser#block.
     def visitBlock(self, ctx:EnglishLangParser.BlockContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by EnglishLangParser#expression.
-    def visitExpression(self, ctx:EnglishLangParser.ExpressionContext):
+    # Visit a parse tree produced by EnglishLangParser#numExpression.
+    def visitNumExpression(self, ctx:EnglishLangParser.NumExpressionContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by EnglishLangParser#condition.
-    def visitCondition(self, ctx:EnglishLangParser.ConditionContext):
+    # Visit a parse tree produced by EnglishLangParser#term.
+    def visitTerm(self, ctx:EnglishLangParser.TermContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by EnglishLangParser#factor.
+    def visitFactor(self, ctx:EnglishLangParser.FactorContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by EnglishLangParser#operation.
+    def visitOperation(self, ctx:EnglishLangParser.OperationContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by EnglishLangParser#reassignment.
+    def visitReassignment(self, ctx:EnglishLangParser.ReassignmentContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by EnglishLangParser#boolExpression.
+    def visitBoolExpression(self, ctx:EnglishLangParser.BoolExpressionContext):
         return self.visitChildren(ctx)
 
 

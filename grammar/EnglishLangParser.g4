@@ -3,74 +3,108 @@ parser grammar EnglishLangParser;
 options { tokenVocab=EnglishLangLexer; }
 
 // Entry point
-program : START_PROGRAM statement* END_PROGRAM ;
+program : START_PROGRAM statement+ END_PROGRAM ;
 
 // Statements
-statement
-    : variableDeclaration
+statement: 
+      variableDeclaration
+    | reassignment
     | functionDeclaration
     | functionCall
     | displayStatement
     | ifStatement
-    | forEachStatement
-    | whileStatement
+    | forLoop
+    | whileLoop
     | returnStatement
+    | operation
     ;
+
+loopStatements:
+      loopStatement
+    | variableDeclaration
+    | reassignment
+    | functionDeclaration
+    | returnStatement
+    | loopIfStatement
+    | block
+    | BREAK
+    ;
+
 
 // Variable Declaration & Assignment
 variableDeclaration
     : SET IDENTIFIER TO expression typeAnnotation
     ;
 
-typeAnnotation
-    : TYPE_INT
-    | TYPE_STRING
-    | TYPE_BOOL
+matrixExpression: (INVERT_MATRIX)? matrixAtom (TRANSPOSITION)?;
+matrixAtom: IDENTIFIER | matrixConstruction;
+
+matrixConstruction: LBRACE row (SEMICOLON row)* RBRACE;
+row: value (COMMA value)*;
+value: NUMBER | IDENTIFIER | matrixExpression;
+
+stringExpression: (STRING | IDENTIFIER) ( PLUS (STRING | IDENTIFIER))*;
+
+
+expression:
+      numExpression
+    | boolExpression
+    | matrixExpression
+    | stringExpression
+    | NUMBER
+    | STRING
+    | IDENTIFIER
     ;
+
+typeAnnotation: TYPE_STRING | TYPE_INT | TYPE_FLOAT | TYPE_BOOL | TYPE_MATRIX;
+
 
 // Function Declaration
 functionDeclaration
-    : DEFINE_FUNCTION IDENTIFIER LPAREN parameterList? RPAREN block END_FUNCTION
+    : DEFINE_FUNCTION IDENTIFIER LPAREN parameter? RPAREN block END_FUNCTION
     ;
 
 // Function Call
 functionCall
-    : CALL IDENTIFIER WITH argumentList
+    : builtInFunctions
+    | IDENTIFIER LPAREN (IDENTIFIER (COMMA IDENTIFIER)*)? RPAREN
     ;
+
+
+builtInFunctions:POWER_FUNC LPAREN numExpression COMMA numExpression RPAREN
+                |
+             (SIN_FUNC | COS_FUNC | TAN_FUNC | CTAN_FUNC )
+              LPAREN numExpression RPAREN;
 
 // Return
 returnStatement
     : RETURN expression
     ;
 
+ifStatement: IF LPAREN boolExpression RPAREN (statement | block)
+             (ELSE_IF LPAREN boolExpression RPAREN (statement | block))*
+             (ELSE (statement | block))?;
+loopIfStatement: IF LPAREN boolExpression RPAREN (LBRACE loopStatements+ RBRACE | statement)
+
+             (ELSE_IF LPAREN boolExpression RPAREN (LBRACE loopStatements+ RBRACE | statement))*
+
+             (ELSE (LBRACE loopStatements+ RBRACE | statement))?;
+
+loopStatement: forLoop | whileLoop;
+
+forLoop: FOR LPAREN (IDENTIFIER| variableDeclaration)? SEMICOLON
+                               boolExpression SEMICOLON
+                               (variableDeclaration | reassignment | operation) RPAREN
+                               (LBRACE loopStatements+ RBRACE| statement);
+whileLoop:
+           WHILE LPAREN boolExpression RPAREN
+           (LBRACE loopStatements+ RBRACE | statement);
+
 // Display
-displayStatement
-    : DISPLAY displayPart (COMMA displayPart)*
-    ;
-
-displayPart
-    : STRING
-    | IDENTIFIER
-    | expression
-    ;
-
-// If / Else
-ifStatement
-    : IF condition block (ELSE_IF condition block)* (ELSE block)? END_IF
-    ;
-
-// While
-whileStatement
-    : WHILE condition block END_WHILE
-    ;
-
-// For Each
-forEachStatement
-    : FOR_EACH IDENTIFIER FROM expression TO expression block END_FOR
-    ;
+displayStatement: DISPLAY expression (',' expression)*;
 
 // Parameters and Arguments
-parameterList
+parameter
     : typedParameter (COMMA typedParameter)*
     ;
 
@@ -78,32 +112,42 @@ typedParameter
     : IDENTIFIER typeAnnotation
     ;
 
-argumentList
-    : expression (COMMA expression)*
-    ;
-
 // Blocks
-block
-    : statement*
-    ;
+block: LBRACE statement+ RBRACE ;
 
 // Expressions
-expression
-    : expression PLUS expression
-    | expression MINUS expression
-    | expression TIMES expression
-    | expression DIVIDED_BY expression
-    | expression MODULO expression
-    | expression comparisonOp expression
-    | LPAREN expression RPAREN
-    | NUMBER
+numExpression : numExpression (PLUS|MINUS) term 
+    | term;
+
+term: term (MULTIPLY|DIVIDED_BY|MODULO) factor
+    | factor;
+
+factor
+    : NUMBER
     | IDENTIFIER
+    | operation
+    | LPAREN numExpression RPAREN
     ;
 
+operation : (IDENTIFIER (INCREMENT | DECREMENT)) | functionCall;
+
+reassignment: IDENTIFIER ((ADD_TO STRING | ADD_TO numExpression)
+                          | SUBTRACT_FROM numExpression
+                          | DIVIDE_FROM numExpression
+                          | TIMES numExpression)
+               SEMICOLON;
+
+
 // Conditions
-condition
-    : expression comparisonOp expression
-    ;
+boolExpression:  numExpression comparisonOp numExpression
+               | stringExpression operator=(EQUALS | NOT_EQUALS) stringExpression
+               | matrixExpression operator=(EQUALS | NOT_EQUALS) matrixExpression
+               | boolExpression operator=(AND | OR)  boolExpression
+               | NOT? LPAREN boolExpression RPAREN
+               | TRUE_VALUE
+               | FALSE_VALUE
+               | NOT? IDENTIFIER;
+
 
 // Comparison Operators
 comparisonOp
