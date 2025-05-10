@@ -125,6 +125,7 @@ term: term (MULTIPLY|DIVIDED_BY|MODULO) factor
 factor
     : NUMBER
     | IDENTIFIER
+    | STRING
     | operation
     | LPAREN numExpression RPAREN
     ;
@@ -148,10 +149,10 @@ boolExpression:  numExpression comparisonOp numExpression
                | FALSE_VALUE
                | NOT? IDENTIFIER;
 
-
 // Comparison Operators
 comparisonOp
     : EQUALS
+    | NOT_EQUALS
     | GREATER_THAN
     | LESS_THAN
     | GREATER_EQUAL

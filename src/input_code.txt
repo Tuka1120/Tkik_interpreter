@@ -1,5 +1,9 @@
 Start Program
     Set x to 4 int
     Set y to 5 int
-    Display (y + x * 3) * 2
+    Display (y + x * 4) * 2
+    
+    Set greeting to "Hello" string
+    Set name to "Alice" string
+    Display greeting + " " + name
 End Program

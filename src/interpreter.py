@@ -85,6 +85,8 @@ class Interpreter(EnglishLangParserVisitor):
         elif ctx.IDENTIFIER():
             name = ctx.IDENTIFIER().getText()
             return self.env.variables.get(name, 0)
+        elif ctx.STRING():
+            return ctx.STRING().getText().strip('"')
         elif ctx.numExpression():
             return self.visit(ctx.numExpression())
         return 0
