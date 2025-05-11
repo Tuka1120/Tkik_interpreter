@@ -13,6 +13,7 @@ statement:
     | functionCall
     | displayStatement
     | ifStatement
+    | loopStatement
     | forLoop
     | whileLoop
     | returnStatement
@@ -28,6 +29,7 @@ loopStatements:
     | loopIfStatement
     | block
     | BREAK
+    | displayStatement
     ;
 
 
@@ -54,6 +56,7 @@ expression:
     | NUMBER
     | STRING
     | IDENTIFIER
+    | '(' expression ')'
     ;
 
 typeAnnotation: TYPE_STRING | TYPE_INT | TYPE_FLOAT | TYPE_BOOL | TYPE_MATRIX;
@@ -92,10 +95,28 @@ loopIfStatement: IF LPAREN boolExpression RPAREN (LBRACE loopStatements+ RBRACE 
 
 loopStatement: forLoop | whileLoop;
 
-forLoop: FOR LPAREN (IDENTIFIER| variableDeclaration)? SEMICOLON
-                               boolExpression SEMICOLON
-                               (variableDeclaration | reassignment | operation) RPAREN
-                               (LBRACE loopStatements+ RBRACE| statement);
+forLoop
+    : FOR LPAREN forInit? SEMICOLON
+              cond=boolExpression SEMICOLON
+              forUpdate RPAREN
+      forBody;
+
+forInit
+    : IDENTIFIER
+    | variableDeclaration
+    ;
+
+forUpdate
+    : variableDeclaration
+    | reassignment
+    | operation
+    ;
+
+forBody
+    : LBRACE loopStatements+ RBRACE
+    | statement
+    ;
+
 whileLoop:
            WHILE LPAREN boolExpression RPAREN
            (LBRACE loopStatements+ RBRACE | statement);

@@ -9,18 +9,20 @@ class Environment:
         self.variables = {}
         self.functions = {}
 
+class BreakStatement:
+    pass
+
+
 class Interpreter(EnglishLangParserVisitor):
     def __init__(self):
         self.env = Environment()
+        self.output_lines = []
 
     def visitProgram(self, ctx):
-        output_lines = []
         for stmt in ctx.statement():
-            result = self.visit(stmt)
-            if result is not None:
-                output_lines.append(str(result))  # Only Display returns something
-        return output_lines
-    
+            self.visit(stmt)  # don't capture return, just visit
+        return self.output_lines  # collected during display
+
     def visitVariableDeclaration(self, ctx):
         name = ctx.IDENTIFIER().getText()
         value = self.visit(ctx.expression())
@@ -73,21 +75,29 @@ class Interpreter(EnglishLangParserVisitor):
     def visitDisplayStatement(self, ctx):
         expressions = ctx.expression()
         results = [self.visit(expr) for expr in expressions]
-        print("DEBUG: Displaying", results)  
-        return ' '.join(str(r) for r in results)
-
+        display_output = ' '.join(str(r) for r in results)
+        print("DEBUG: Displaying", results)
+        self.output_lines.append(display_output)
+        return display_output
 
     def visitNumExpression(self, ctx):
         if ctx.getChildCount() == 3:
             left = self.visit(ctx.getChild(0))
             op = ctx.getChild(1).getText()
             right = self.visit(ctx.getChild(2))
+
             if op == '+':
-                return left + right
+                if isinstance(left, str) or isinstance(right, str):
+                    return str(left) + str(right)
+                else:
+                    return left + right
             elif op == '-':
-                return left - right
+                if isinstance(left, (int, float)) and isinstance(right, (int, float)):
+                    return left - right
+                else:
+                    raise TypeError(f"Unsupported operand types for -: {type(left)} and {type(right)}")
         return self.visit(ctx.getChild(0))
-    
+
     def visitTerm(self, ctx):
         if ctx.getChildCount() == 3:
             left = self.visit(ctx.getChild(0))
@@ -187,20 +197,82 @@ class Interpreter(EnglishLangParserVisitor):
         return None
 
     def visitLoopIfStatement(self, ctx):
-        # Evaluate main IF condition
+        # Main IF condition
         if self.visit(ctx.boolExpression(0)):
-            return self.visit(ctx.loopStatements(0)) if ctx.loopStatements(0) else self.visit(ctx.statement(0))
+            if ctx.loopStatements(0):
+                return self.visit(ctx.loopStatements(0))
+            elif ctx.statement(0):
+                return self.visit(ctx.statement(0))
 
-        # Check ELSE IF conditions
+        # ELSE IFs
         for i in range(1, len(ctx.boolExpression())):
             if self.visit(ctx.boolExpression(i)):
-                return self.visit(ctx.loopStatements(i)) if ctx.loopStatements(i) else self.visit(ctx.statement(i))
+                if ctx.loopStatements(i):
+                    return self.visit(ctx.loopStatements(i))
+                elif ctx.statement(i):
+                    return self.visit(ctx.statement(i))
 
         # ELSE clause
-        if ctx.ELSE():
-            return self.visit(ctx.loopStatements(-1)) if ctx.loopStatements(-1) else self.visit(ctx.statement(-1))
+        if ctx.ELSE():  # Check if ELSE exists
+            idx = len(ctx.boolExpression())
+            if len(ctx.loopStatements()) > idx:
+                return self.visit(ctx.loopStatements(idx))
+            elif len(ctx.statement()) > idx:
+                return self.visit(ctx.statement(idx))
 
         return None
+
+    def visitBreakStatement(self, ctx):
+        return BreakStatement()
+    
+    def visitLoopStatements(self, ctx):
+        if ctx.loopStatement():
+            return self.visit(ctx.loopStatement())
+        elif ctx.variableDeclaration():
+            return self.visit(ctx.variableDeclaration())
+        elif ctx.reassignment():
+            return self.visit(ctx.reassignment())
+        elif ctx.functionDeclaration():
+            return self.visit(ctx.functionDeclaration())
+        elif ctx.returnStatement():
+            return self.visit(ctx.returnStatement())
+        elif ctx.loopIfStatement():
+            return self.visit(ctx.loopIfStatement())
+        elif ctx.block():
+            return self.visit(ctx.block())
+        elif ctx.displayStatement():
+            return self.visit(ctx.displayStatement())
+
+
+    def visitWhileLoop(self, ctx):
+        # Evaluate the condition
+        while self.visit(ctx.boolExpression()):
+            # Loop over the statements in the body of the loop
+            if ctx.LBRACE():
+                for stmt in ctx.loopStatements():
+                    self.visit(stmt)
+            else:
+                self.visit(ctx.statement())
+
+    def visitForLoop(self, ctx):
+        if ctx.forInit():
+            self.visit(ctx.forInit())
+
+        def condition():
+            return self.visit(ctx.cond)
+
+        def update():
+            self.visit(ctx.forUpdate())
+
+        if ctx.forBody().LBRACE():
+            body_statements = ctx.forBody().loopStatements()
+        else:
+            body_statements = [ctx.forBody().statement()]
+
+        while condition():
+            for stmt in body_statements:
+                self.visit(stmt)
+            update()
 
 
     def evaluateBinaryOp(self, left, right, op):

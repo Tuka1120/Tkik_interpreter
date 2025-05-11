@@ -42,7 +42,7 @@ def main():
         else:
             out_file.write(str(output_lines))
 
-    print("✅ Parsed successfully. Check output.txt for the result.")
+    print("Parsed successfully.")
 
 if __name__ == '__main__':
     main()

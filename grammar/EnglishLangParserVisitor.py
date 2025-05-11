@@ -109,6 +109,21 @@ class EnglishLangParserVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by EnglishLangParser#forInit.
+    def visitForInit(self, ctx:EnglishLangParser.ForInitContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by EnglishLangParser#forUpdate.
+    def visitForUpdate(self, ctx:EnglishLangParser.ForUpdateContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by EnglishLangParser#forBody.
+    def visitForBody(self, ctx:EnglishLangParser.ForBodyContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by EnglishLangParser#whileLoop.
     def visitWhileLoop(self, ctx:EnglishLangParser.WhileLoopContext):
         return self.visitChildren(ctx)

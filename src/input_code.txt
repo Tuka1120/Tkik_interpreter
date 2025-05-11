@@ -2,6 +2,8 @@ Start Program
     Set x to 4 int
     Set y to 5 int
     Display (y + x * 4) * 2
+    Display x + y, "Sum: ", (x + y) * 2
+
 
     Set greeting to "Hello" string
     Set name to "Alice" string
@@ -21,5 +23,26 @@ Start Program
         Display "a is equal to b"
     Else
         Display "a is greater than b"
+
+
+    Set i to 0 int
+    While (i <= 3)
+    {
+        Display i
+        Set i to i + 1 int
+    }
+
+    Set i to 0 int
+    For (Set j to 10 int; j > 0; Set j to j - 1 int)
+    {
+        If (j / 2 == 0)
+            Display "Even:", j
+        Else
+            Display "Odd:", j
+
+        Set i to i + 1 int
+    }
+    Display "Loop ran", i, "times"
+
     
 End Program

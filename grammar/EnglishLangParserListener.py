@@ -188,6 +188,33 @@ class EnglishLangParserListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by EnglishLangParser#forInit.
+    def enterForInit(self, ctx:EnglishLangParser.ForInitContext):
+        pass
+
+    # Exit a parse tree produced by EnglishLangParser#forInit.
+    def exitForInit(self, ctx:EnglishLangParser.ForInitContext):
+        pass
+
+
+    # Enter a parse tree produced by EnglishLangParser#forUpdate.
+    def enterForUpdate(self, ctx:EnglishLangParser.ForUpdateContext):
+        pass
+
+    # Exit a parse tree produced by EnglishLangParser#forUpdate.
+    def exitForUpdate(self, ctx:EnglishLangParser.ForUpdateContext):
+        pass
+
+
+    # Enter a parse tree produced by EnglishLangParser#forBody.
+    def enterForBody(self, ctx:EnglishLangParser.ForBodyContext):
+        pass
+
+    # Exit a parse tree produced by EnglishLangParser#forBody.
+    def exitForBody(self, ctx:EnglishLangParser.ForBodyContext):
+        pass
+
+
     # Enter a parse tree produced by EnglishLangParser#whileLoop.
     def enterWhileLoop(self, ctx:EnglishLangParser.WhileLoopContext):
         pass
