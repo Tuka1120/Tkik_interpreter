@@ -9,10 +9,17 @@ Start Program
 
     Set a to 5 int
     Set b to 10 int
+    Set c to 6 int
     Set isLess to a < b bool
     Set isMore to a > b bool
     Set result to isLess and not isMore bool
     Display result
 
+    If (a < b and a < c)
+        Display "a is less than b and c"
+    Else If (a == b)
+        Display "a is equal to b"
+    Else
+        Display "a is greater than b"
     
 End Program

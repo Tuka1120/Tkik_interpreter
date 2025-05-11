@@ -21,9 +21,6 @@ class Interpreter(EnglishLangParserVisitor):
                 output_lines.append(str(result))  # Only Display returns something
         return output_lines
     
-    def visitStatement(self, ctx):
-        return self.visitChildren(ctx)
-
     def visitVariableDeclaration(self, ctx):
         name = ctx.IDENTIFIER().getText()
         value = self.visit(ctx.expression())
@@ -162,25 +159,33 @@ class Interpreter(EnglishLangParserVisitor):
         value = self.env.variables.get(name, False)
         return not bool(value) if ctx.NOT() else bool(value)
     
+    def visitStatement(self, ctx):
+        return self.visitChildren(ctx)
+
     def visitIfStatement(self, ctx):
-        # Check the main IF condition
+        # If
         if self.visit(ctx.boolExpression(0)):
-            return self.visit(ctx.statement() or ctx.block())
-        
-        # Check ELSE IF conditions, if any
-        for i in range(1, len(ctx.boolExpression())):
-            if self.visit(ctx.boolExpression(i)):
-                statement_index = i  # i-th else-if matches i-th statement/block
-                return self.visit(ctx.statement(statement_index - 1) or ctx.block(statement_index - 1))
-        
-        # Handle ELSE clause, if present
+            stmt_or_block = ctx.statement(0) or ctx.block(0)
+            if stmt_or_block:
+                return self.visit(stmt_or_block)
+
+        # Else If
+        for i in range(len(ctx.ELSE_IF())):
+            if self.visit(ctx.boolExpression(i + 1)):
+                stmt_or_block = ctx.statement(i + 1) or ctx.block(i + 1)
+                if stmt_or_block:
+                    return self.visit(stmt_or_block)
+
+        # Else
         if ctx.ELSE():
-            # The last child is either a statement or a block
-            else_stmt = ctx.statement(-1) or ctx.block(-1)
-            return self.visit(else_stmt)
+            # Check how many statements/blocks there are
+            num_ifs = 1 + len(ctx.ELSE_IF())
+            stmt_or_block = ctx.statement(num_ifs) or ctx.block(num_ifs)
+            if stmt_or_block:
+                return self.visit(stmt_or_block)
 
         return None
-    
+
     def visitLoopIfStatement(self, ctx):
         # Evaluate main IF condition
         if self.visit(ctx.boolExpression(0)):
