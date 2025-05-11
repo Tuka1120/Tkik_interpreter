@@ -44,11 +44,9 @@ DECREMENT       : '--';
 TIMES           : '*=';
 DIVIDE_FROM     : '/=';
 NOT_EQUALS : '!=';
-AND        : '&&';
-OR         : '||';
-NOT           : '!';
-
-
+AND        : 'and';
+OR         : 'or';
+NOT           : 'not';
 
 // Punctuation
 SEMICOLON : ';';

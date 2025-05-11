@@ -194,7 +194,7 @@ class EnglishLangParser ( Parser ):
                      "'break'", "'While'", "'End While'", "'invert'", "''T'", 
                      "'+'", "'-'", "'*'", "'/'", "'%'", "'=='", "'>'", "'<'", 
                      "'>='", "'<='", "'+='", "'-='", "'++'", "'--'", "'*='", 
-                     "'/='", "'!='", "'&&'", "'||'", "'!'", "';'", "','", 
+                     "'/='", "'!='", "'and'", "'or'", "'not'", "';'", "','", 
                      "':'", "'.'", "'\"'", "'['", "']'", "'{'", "'}'", "'('", 
                      "')'", "<INVALID>", "<INVALID>", "'int'", "'string'", 
                      "'bool'", "'float'", "'matrix'", "'void'", "'true'", 
@@ -3195,18 +3195,21 @@ class EnglishLangParser ( Parser ):
         def __init__(self, parser, parent:ParserRuleContext=None, invokingState:int=-1):
             super().__init__(parent, invokingState)
             self.parser = parser
-            self.operator = None # Token
-
-        def numExpression(self, i:int=None):
-            if i is None:
-                return self.getTypedRuleContexts(EnglishLangParser.NumExpressionContext)
-            else:
-                return self.getTypedRuleContext(EnglishLangParser.NumExpressionContext,i)
 
 
-        def comparisonOp(self):
-            return self.getTypedRuleContext(EnglishLangParser.ComparisonOpContext,0)
+        def getRuleIndex(self):
+            return EnglishLangParser.RULE_boolExpression
 
+     
+        def copyFrom(self, ctx:ParserRuleContext):
+            super().copyFrom(ctx)
+
+
+    class StringComparisonContext(BoolExpressionContext):
+
+        def __init__(self, parser, ctx:ParserRuleContext): # actually a EnglishLangParser.BoolExpressionContext
+            super().__init__(parser)
+            self.copyFrom(ctx)
 
         def stringExpression(self, i:int=None):
             if i is None:
@@ -3214,22 +3217,55 @@ class EnglishLangParser ( Parser ):
             else:
                 return self.getTypedRuleContext(EnglishLangParser.StringExpressionContext,i)
 
-
         def EQUALS(self):
             return self.getToken(EnglishLangParser.EQUALS, 0)
-
         def NOT_EQUALS(self):
             return self.getToken(EnglishLangParser.NOT_EQUALS, 0)
 
-        def matrixExpression(self, i:int=None):
-            if i is None:
-                return self.getTypedRuleContexts(EnglishLangParser.MatrixExpressionContext)
+        def enterRule(self, listener:ParseTreeListener):
+            if hasattr( listener, "enterStringComparison" ):
+                listener.enterStringComparison(self)
+
+        def exitRule(self, listener:ParseTreeListener):
+            if hasattr( listener, "exitStringComparison" ):
+                listener.exitStringComparison(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitStringComparison" ):
+                return visitor.visitStringComparison(self)
             else:
-                return self.getTypedRuleContext(EnglishLangParser.MatrixExpressionContext,i)
+                return visitor.visitChildren(self)
 
 
-        def LPAREN(self):
-            return self.getToken(EnglishLangParser.LPAREN, 0)
+    class FalseLiteralContext(BoolExpressionContext):
+
+        def __init__(self, parser, ctx:ParserRuleContext): # actually a EnglishLangParser.BoolExpressionContext
+            super().__init__(parser)
+            self.copyFrom(ctx)
+
+        def FALSE_VALUE(self):
+            return self.getToken(EnglishLangParser.FALSE_VALUE, 0)
+
+        def enterRule(self, listener:ParseTreeListener):
+            if hasattr( listener, "enterFalseLiteral" ):
+                listener.enterFalseLiteral(self)
+
+        def exitRule(self, listener:ParseTreeListener):
+            if hasattr( listener, "exitFalseLiteral" ):
+                listener.exitFalseLiteral(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitFalseLiteral" ):
+                return visitor.visitFalseLiteral(self)
+            else:
+                return visitor.visitChildren(self)
+
+
+    class LogicBinaryContext(BoolExpressionContext):
+
+        def __init__(self, parser, ctx:ParserRuleContext): # actually a EnglishLangParser.BoolExpressionContext
+            super().__init__(parser)
+            self.copyFrom(ctx)
 
         def boolExpression(self, i:int=None):
             if i is None:
@@ -3237,42 +3273,166 @@ class EnglishLangParser ( Parser ):
             else:
                 return self.getTypedRuleContext(EnglishLangParser.BoolExpressionContext,i)
 
+        def AND(self):
+            return self.getToken(EnglishLangParser.AND, 0)
+        def OR(self):
+            return self.getToken(EnglishLangParser.OR, 0)
+
+        def enterRule(self, listener:ParseTreeListener):
+            if hasattr( listener, "enterLogicBinary" ):
+                listener.enterLogicBinary(self)
+
+        def exitRule(self, listener:ParseTreeListener):
+            if hasattr( listener, "exitLogicBinary" ):
+                listener.exitLogicBinary(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitLogicBinary" ):
+                return visitor.visitLogicBinary(self)
+            else:
+                return visitor.visitChildren(self)
+
+
+    class NumComparisonContext(BoolExpressionContext):
+
+        def __init__(self, parser, ctx:ParserRuleContext): # actually a EnglishLangParser.BoolExpressionContext
+            super().__init__(parser)
+            self.copyFrom(ctx)
+
+        def numExpression(self, i:int=None):
+            if i is None:
+                return self.getTypedRuleContexts(EnglishLangParser.NumExpressionContext)
+            else:
+                return self.getTypedRuleContext(EnglishLangParser.NumExpressionContext,i)
+
+        def comparisonOp(self):
+            return self.getTypedRuleContext(EnglishLangParser.ComparisonOpContext,0)
+
+
+        def enterRule(self, listener:ParseTreeListener):
+            if hasattr( listener, "enterNumComparison" ):
+                listener.enterNumComparison(self)
+
+        def exitRule(self, listener:ParseTreeListener):
+            if hasattr( listener, "exitNumComparison" ):
+                listener.exitNumComparison(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitNumComparison" ):
+                return visitor.visitNumComparison(self)
+            else:
+                return visitor.visitChildren(self)
+
+
+    class LogicParenContext(BoolExpressionContext):
+
+        def __init__(self, parser, ctx:ParserRuleContext): # actually a EnglishLangParser.BoolExpressionContext
+            super().__init__(parser)
+            self.copyFrom(ctx)
+
+        def LPAREN(self):
+            return self.getToken(EnglishLangParser.LPAREN, 0)
+        def boolExpression(self):
+            return self.getTypedRuleContext(EnglishLangParser.BoolExpressionContext,0)
 
         def RPAREN(self):
             return self.getToken(EnglishLangParser.RPAREN, 0)
-
         def NOT(self):
             return self.getToken(EnglishLangParser.NOT, 0)
+
+        def enterRule(self, listener:ParseTreeListener):
+            if hasattr( listener, "enterLogicParen" ):
+                listener.enterLogicParen(self)
+
+        def exitRule(self, listener:ParseTreeListener):
+            if hasattr( listener, "exitLogicParen" ):
+                listener.exitLogicParen(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitLogicParen" ):
+                return visitor.visitLogicParen(self)
+            else:
+                return visitor.visitChildren(self)
+
+
+    class TrueLiteralContext(BoolExpressionContext):
+
+        def __init__(self, parser, ctx:ParserRuleContext): # actually a EnglishLangParser.BoolExpressionContext
+            super().__init__(parser)
+            self.copyFrom(ctx)
 
         def TRUE_VALUE(self):
             return self.getToken(EnglishLangParser.TRUE_VALUE, 0)
 
-        def FALSE_VALUE(self):
-            return self.getToken(EnglishLangParser.FALSE_VALUE, 0)
+        def enterRule(self, listener:ParseTreeListener):
+            if hasattr( listener, "enterTrueLiteral" ):
+                listener.enterTrueLiteral(self)
+
+        def exitRule(self, listener:ParseTreeListener):
+            if hasattr( listener, "exitTrueLiteral" ):
+                listener.exitTrueLiteral(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitTrueLiteral" ):
+                return visitor.visitTrueLiteral(self)
+            else:
+                return visitor.visitChildren(self)
+
+
+    class LogicIdentifierContext(BoolExpressionContext):
+
+        def __init__(self, parser, ctx:ParserRuleContext): # actually a EnglishLangParser.BoolExpressionContext
+            super().__init__(parser)
+            self.copyFrom(ctx)
 
         def IDENTIFIER(self):
             return self.getToken(EnglishLangParser.IDENTIFIER, 0)
-
-        def AND(self):
-            return self.getToken(EnglishLangParser.AND, 0)
-
-        def OR(self):
-            return self.getToken(EnglishLangParser.OR, 0)
-
-        def getRuleIndex(self):
-            return EnglishLangParser.RULE_boolExpression
+        def NOT(self):
+            return self.getToken(EnglishLangParser.NOT, 0)
 
         def enterRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "enterBoolExpression" ):
-                listener.enterBoolExpression(self)
+            if hasattr( listener, "enterLogicIdentifier" ):
+                listener.enterLogicIdentifier(self)
 
         def exitRule(self, listener:ParseTreeListener):
-            if hasattr( listener, "exitBoolExpression" ):
-                listener.exitBoolExpression(self)
+            if hasattr( listener, "exitLogicIdentifier" ):
+                listener.exitLogicIdentifier(self)
 
         def accept(self, visitor:ParseTreeVisitor):
-            if hasattr( visitor, "visitBoolExpression" ):
-                return visitor.visitBoolExpression(self)
+            if hasattr( visitor, "visitLogicIdentifier" ):
+                return visitor.visitLogicIdentifier(self)
+            else:
+                return visitor.visitChildren(self)
+
+
+    class MatrixComparisonContext(BoolExpressionContext):
+
+        def __init__(self, parser, ctx:ParserRuleContext): # actually a EnglishLangParser.BoolExpressionContext
+            super().__init__(parser)
+            self.copyFrom(ctx)
+
+        def matrixExpression(self, i:int=None):
+            if i is None:
+                return self.getTypedRuleContexts(EnglishLangParser.MatrixExpressionContext)
+            else:
+                return self.getTypedRuleContext(EnglishLangParser.MatrixExpressionContext,i)
+
+        def EQUALS(self):
+            return self.getToken(EnglishLangParser.EQUALS, 0)
+        def NOT_EQUALS(self):
+            return self.getToken(EnglishLangParser.NOT_EQUALS, 0)
+
+        def enterRule(self, listener:ParseTreeListener):
+            if hasattr( listener, "enterMatrixComparison" ):
+                listener.enterMatrixComparison(self)
+
+        def exitRule(self, listener:ParseTreeListener):
+            if hasattr( listener, "exitMatrixComparison" ):
+                listener.exitMatrixComparison(self)
+
+        def accept(self, visitor:ParseTreeVisitor):
+            if hasattr( visitor, "visitMatrixComparison" ):
+                return visitor.visitMatrixComparison(self)
             else:
                 return visitor.visitChildren(self)
 
@@ -3292,6 +3452,10 @@ class EnglishLangParser ( Parser ):
             self._errHandler.sync(self)
             la_ = self._interp.adaptivePredict(self._input,47,self._ctx)
             if la_ == 1:
+                localctx = EnglishLangParser.NumComparisonContext(self, localctx)
+                self._ctx = localctx
+                _prevctx = localctx
+
                 self.state = 402
                 self.numExpression(0)
                 self.state = 403
@@ -3301,13 +3465,15 @@ class EnglishLangParser ( Parser ):
                 pass
 
             elif la_ == 2:
+                localctx = EnglishLangParser.StringComparisonContext(self, localctx)
+                self._ctx = localctx
+                _prevctx = localctx
                 self.state = 406
                 self.stringExpression()
                 self.state = 407
-                localctx.operator = self._input.LT(1)
                 _la = self._input.LA(1)
                 if not(_la==29 or _la==40):
-                    localctx.operator = self._errHandler.recoverInline(self)
+                    self._errHandler.recoverInline(self)
                 else:
                     self._errHandler.reportMatch(self)
                     self.consume()
@@ -3316,13 +3482,15 @@ class EnglishLangParser ( Parser ):
                 pass
 
             elif la_ == 3:
+                localctx = EnglishLangParser.MatrixComparisonContext(self, localctx)
+                self._ctx = localctx
+                _prevctx = localctx
                 self.state = 410
                 self.matrixExpression()
                 self.state = 411
-                localctx.operator = self._input.LT(1)
                 _la = self._input.LA(1)
                 if not(_la==29 or _la==40):
-                    localctx.operator = self._errHandler.recoverInline(self)
+                    self._errHandler.recoverInline(self)
                 else:
                     self._errHandler.reportMatch(self)
                     self.consume()
@@ -3331,6 +3499,9 @@ class EnglishLangParser ( Parser ):
                 pass
 
             elif la_ == 4:
+                localctx = EnglishLangParser.LogicParenContext(self, localctx)
+                self._ctx = localctx
+                _prevctx = localctx
                 self.state = 415
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
@@ -3348,16 +3519,25 @@ class EnglishLangParser ( Parser ):
                 pass
 
             elif la_ == 5:
+                localctx = EnglishLangParser.TrueLiteralContext(self, localctx)
+                self._ctx = localctx
+                _prevctx = localctx
                 self.state = 421
                 self.match(EnglishLangParser.TRUE_VALUE)
                 pass
 
             elif la_ == 6:
+                localctx = EnglishLangParser.FalseLiteralContext(self, localctx)
+                self._ctx = localctx
+                _prevctx = localctx
                 self.state = 422
                 self.match(EnglishLangParser.FALSE_VALUE)
                 pass
 
             elif la_ == 7:
+                localctx = EnglishLangParser.LogicIdentifierContext(self, localctx)
+                self._ctx = localctx
+                _prevctx = localctx
                 self.state = 424
                 self._errHandler.sync(self)
                 _la = self._input.LA(1)
@@ -3380,17 +3560,16 @@ class EnglishLangParser ( Parser ):
                     if self._parseListeners is not None:
                         self.triggerExitRuleEvent()
                     _prevctx = localctx
-                    localctx = EnglishLangParser.BoolExpressionContext(self, _parentctx, _parentState)
+                    localctx = EnglishLangParser.LogicBinaryContext(self, EnglishLangParser.BoolExpressionContext(self, _parentctx, _parentState))
                     self.pushNewRecursionContext(localctx, _startState, self.RULE_boolExpression)
                     self.state = 429
                     if not self.precpred(self._ctx, 5):
                         from antlr4.error.Errors import FailedPredicateException
                         raise FailedPredicateException(self, "self.precpred(self._ctx, 5)")
                     self.state = 430
-                    localctx.operator = self._input.LT(1)
                     _la = self._input.LA(1)
                     if not(_la==41 or _la==42):
-                        localctx.operator = self._errHandler.recoverInline(self)
+                        self._errHandler.recoverInline(self)
                     else:
                         self._errHandler.reportMatch(self)
                         self.consume()

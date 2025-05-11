@@ -140,14 +140,16 @@ reassignment: IDENTIFIER ((ADD_TO STRING | ADD_TO numExpression)
 
 
 // Conditions
-boolExpression:  numExpression comparisonOp numExpression
-               | stringExpression operator=(EQUALS | NOT_EQUALS) stringExpression
-               | matrixExpression operator=(EQUALS | NOT_EQUALS) matrixExpression
-               | boolExpression operator=(AND | OR)  boolExpression
-               | NOT? LPAREN boolExpression RPAREN
-               | TRUE_VALUE
-               | FALSE_VALUE
-               | NOT? IDENTIFIER;
+boolExpression
+    : numExpression comparisonOp numExpression                            #numComparison
+    | stringExpression (EQUALS | NOT_EQUALS) stringExpression             #stringComparison
+    | matrixExpression (EQUALS | NOT_EQUALS) matrixExpression             #matrixComparison
+    | boolExpression (AND | OR) boolExpression                            #logicBinary
+    | NOT? LPAREN boolExpression RPAREN                                   #logicParen
+    | TRUE_VALUE                                                          #trueLiteral
+    | FALSE_VALUE                                                         #falseLiteral
+    | NOT? IDENTIFIER                                                     #logicIdentifier
+    ;
 
 // Comparison Operators
 comparisonOp

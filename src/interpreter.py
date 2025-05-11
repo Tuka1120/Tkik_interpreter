@@ -20,12 +20,37 @@ class Interpreter(EnglishLangParserVisitor):
             if result is not None:
                 output_lines.append(str(result))  # Only Display returns something
         return output_lines
+    
+    def visitStatement(self, ctx):
+        return self.visitChildren(ctx)
 
     def visitVariableDeclaration(self, ctx):
         name = ctx.IDENTIFIER().getText()
         value = self.visit(ctx.expression())
+
+        type_ctx = ctx.typeAnnotation()
+        declared_type = type_ctx.getText().lower() if type_ctx else "unknown"
+
+        if declared_type == 'int':
+            value = int(value) if isinstance(value, (int, float, str)) else 0
+        elif declared_type == 'float':
+            value = float(value) if isinstance(value, (int, float, str)) else 0.0
+        elif declared_type == 'bool':
+            if isinstance(value, str):
+                value = value.lower() == 'true'
+            else:
+                value = bool(value)
+        elif declared_type == 'string':
+            value = str(value)
+        elif declared_type == 'matrix':
+            if not isinstance(value, list) or not all(isinstance(row, list) for row in value):
+                raise Exception(f"Invalid matrix assignment to variable '{name}'")
+        else:
+            raise Exception(f"Unknown type '{declared_type}' for variable '{name}'")
+
         self.env.variables[name] = value
-        return None 
+        return None
+
 
     def visitAssignment(self, ctx):
         name = ctx.IDENTIFIER().getText()
@@ -90,6 +115,88 @@ class Interpreter(EnglishLangParserVisitor):
         elif ctx.numExpression():
             return self.visit(ctx.numExpression())
         return 0
+    
+    def visitNumComparison(self, ctx):
+        left = self.visit(ctx.numExpression(0))
+        right = self.visit(ctx.numExpression(1))
+        op = ctx.comparisonOp().getText()
+        return self.evaluateBinaryOp(left, right, op)
+
+    def visitStringComparison(self, ctx):
+        left = self.visit(ctx.stringExpression(0))
+        right = self.visit(ctx.stringExpression(1))
+        op = ctx.getChild(1).getText()
+        return (left == right) if op == "==" else (left != right)
+
+    def visitMatrixComparison(self, ctx):
+        left = self.visit(ctx.matrixExpression(0))
+        right = self.visit(ctx.matrixExpression(1))
+        op = ctx.getChild(1).getText()
+        return (left == right) if op == "==" else (left != right)
+
+    def visitLogicBinary(self, ctx):
+        left = self.visit(ctx.boolExpression(0))
+        right = self.visit(ctx.boolExpression(1))
+        op = ctx.getChild(1).getText()
+        if op == "and":
+            return bool(left) and bool(right)
+        elif op == "or":
+            return bool(left) or bool(right)
+        else:
+            raise Exception(f"Unsupported logical operator: {op}")
+
+    def visitLogicParen(self, ctx):
+        value = self.visit(ctx.boolExpression())
+        if ctx.NOT():
+            return not bool(value)
+        return bool(value)
+
+    def visitTrueLiteral(self, ctx):
+        return True
+
+    def visitFalseLiteral(self, ctx):
+        return False
+
+    def visitLogicIdentifier(self, ctx):
+        name = ctx.IDENTIFIER().getText()
+        value = self.env.variables.get(name, False)
+        return not bool(value) if ctx.NOT() else bool(value)
+    
+    def visitIfStatement(self, ctx):
+        # Check the main IF condition
+        if self.visit(ctx.boolExpression(0)):
+            return self.visit(ctx.statement() or ctx.block())
+        
+        # Check ELSE IF conditions, if any
+        for i in range(1, len(ctx.boolExpression())):
+            if self.visit(ctx.boolExpression(i)):
+                statement_index = i  # i-th else-if matches i-th statement/block
+                return self.visit(ctx.statement(statement_index - 1) or ctx.block(statement_index - 1))
+        
+        # Handle ELSE clause, if present
+        if ctx.ELSE():
+            # The last child is either a statement or a block
+            else_stmt = ctx.statement(-1) or ctx.block(-1)
+            return self.visit(else_stmt)
+
+        return None
+    
+    def visitLoopIfStatement(self, ctx):
+        # Evaluate main IF condition
+        if self.visit(ctx.boolExpression(0)):
+            return self.visit(ctx.loopStatements(0)) if ctx.loopStatements(0) else self.visit(ctx.statement(0))
+
+        # Check ELSE IF conditions
+        for i in range(1, len(ctx.boolExpression())):
+            if self.visit(ctx.boolExpression(i)):
+                return self.visit(ctx.loopStatements(i)) if ctx.loopStatements(i) else self.visit(ctx.statement(i))
+
+        # ELSE clause
+        if ctx.ELSE():
+            return self.visit(ctx.loopStatements(-1)) if ctx.loopStatements(-1) else self.visit(ctx.statement(-1))
+
+        return None
+
 
     def evaluateBinaryOp(self, left, right, op):
         if op == '+': return left + right
@@ -97,6 +204,12 @@ class Interpreter(EnglishLangParserVisitor):
         elif op == '*': return left * right
         elif op == '/': return left / right
         elif op == '%': return left % right
+        elif op == '<': return left < right
+        elif op == '>': return left > right
+        elif op == '==': return left == right
+        elif op == '!=': return left != right
+        elif op == '<=': return left <= right
+        elif op == '>=': return left >= right
         else: raise Exception(f"Unknown operator {op}")
 
     def visitFunctionCall(self, ctx):
@@ -106,6 +219,8 @@ class Interpreter(EnglishLangParserVisitor):
     def visitExpression(self, ctx):
         if ctx.numExpression():
             return self.visit(ctx.numExpression())
+        elif ctx.boolExpression():
+            return self.visit(ctx.boolExpression())
         elif ctx.STRING():
             return ctx.STRING().getText().strip('"')
         elif ctx.IDENTIFIER():
