@@ -42,8 +42,8 @@ class Interpreter(EnglishLangParserVisitor):
 
     def visitProgram(self, ctx):
         for stmt in ctx.statement():
-            self.visit(stmt)  # don't capture return, just visit
-        return self.output_lines  # collected during display
+            self.visit(stmt) 
+        return self.output_lines
 
     def visitVariableDeclaration(self, ctx):
         name = ctx.IDENTIFIER().getText()
@@ -103,26 +103,23 @@ class Interpreter(EnglishLangParserVisitor):
         params = func['params']
         body = func['body']
 
-        # Evaluate the arguments
         args = [self.visit(expr) for expr in ctx.expression()]
         if len(args) != len(params):
             raise Exception(f"Function '{name}' expects {len(params)} arguments, got {len(args)}")
 
-        # Save current variable scope
         old_scope = self.variables.copy()
 
-        # Assign arguments to parameters
         for param, arg in zip(params, args):
             self.variables[param] = arg
 
         try:
             self.visit(body)
         except FunctionReturn as ret:
-            self.variables = old_scope  # Restore scope
+            self.variables = old_scope  
             return ret.value
 
-        self.variables = old_scope  # Restore scope
-        return None  # If no return statement
+        self.variables = old_scope  
+        return None 
 
     
     def visitReturnStatement(self, ctx):
@@ -267,7 +264,6 @@ class Interpreter(EnglishLangParserVisitor):
 
         # Else
         if ctx.ELSE():
-            # Check how many statements/blocks there are
             num_ifs = 1 + len(ctx.ELSE_IF())
             stmt_or_block = ctx.statement(num_ifs) or ctx.block(num_ifs)
             if stmt_or_block:
@@ -324,9 +320,7 @@ class Interpreter(EnglishLangParserVisitor):
 
 
     def visitWhileLoop(self, ctx):
-        # Evaluate the condition
         while self.visit(ctx.boolExpression()):
-            # Loop over the statements in the body of the loop
             if ctx.LBRACE():
                 for stmt in ctx.loopStatements():
                     self.visit(stmt)
