@@ -74,6 +74,21 @@ class EnglishLangParserVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by EnglishLangParser#parameter.
+    def visitParameter(self, ctx:EnglishLangParser.ParameterContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by EnglishLangParser#typedParameter.
+    def visitTypedParameter(self, ctx:EnglishLangParser.TypedParameterContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by EnglishLangParser#returnStatement.
+    def visitReturnStatement(self, ctx:EnglishLangParser.ReturnStatementContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by EnglishLangParser#functionCall.
     def visitFunctionCall(self, ctx:EnglishLangParser.FunctionCallContext):
         return self.visitChildren(ctx)
@@ -81,11 +96,6 @@ class EnglishLangParserVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by EnglishLangParser#builtInFunctions.
     def visitBuiltInFunctions(self, ctx:EnglishLangParser.BuiltInFunctionsContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by EnglishLangParser#returnStatement.
-    def visitReturnStatement(self, ctx:EnglishLangParser.ReturnStatementContext):
         return self.visitChildren(ctx)
 
 
@@ -131,16 +141,6 @@ class EnglishLangParserVisitor(ParseTreeVisitor):
 
     # Visit a parse tree produced by EnglishLangParser#displayStatement.
     def visitDisplayStatement(self, ctx:EnglishLangParser.DisplayStatementContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by EnglishLangParser#parameter.
-    def visitParameter(self, ctx:EnglishLangParser.ParameterContext):
-        return self.visitChildren(ctx)
-
-
-    # Visit a parse tree produced by EnglishLangParser#typedParameter.
-    def visitTypedParameter(self, ctx:EnglishLangParser.TypedParameterContext):
         return self.visitChildren(ctx)
 
 

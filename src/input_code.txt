@@ -44,5 +44,20 @@ Start Program
     }
     Display "Loop ran", i, "times"
 
+
+    Define Function addNumbers (num1 int, num2 int){
+        Set result to num1 + num2 int
+        Display result
+    }End Function
+
+    Call addNumbers (5, 3)
+
+    Define Function printMessage (message string){ 
+        Display message
+    }End Function
+
+    Call printMessage ("Hello, World!")
+
+
     
 End Program

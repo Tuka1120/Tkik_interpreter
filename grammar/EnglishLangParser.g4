@@ -10,13 +10,13 @@ statement:
       variableDeclaration
     | reassignment
     | functionDeclaration
+    | returnStatement
     | functionCall
     | displayStatement
     | ifStatement
     | loopStatement
     | forLoop
     | whileLoop
-    | returnStatement
     | operation
     ;
 
@@ -67,10 +67,24 @@ functionDeclaration
     : DEFINE_FUNCTION IDENTIFIER LPAREN parameter? RPAREN block END_FUNCTION
     ;
 
+// Parameters and Arguments
+parameter
+    : typedParameter (COMMA typedParameter)*
+    ;
+
+typedParameter
+    : IDENTIFIER typeAnnotation
+    ;
+
+// Return
+returnStatement
+    : RETURN expression
+    ;
+
 // Function Call
 functionCall
     : builtInFunctions
-    | IDENTIFIER LPAREN (IDENTIFIER (COMMA IDENTIFIER)*)? RPAREN
+    | CALL? IDENTIFIER LPAREN (expression (COMMA expression)*)? RPAREN
     ;
 
 
@@ -79,10 +93,6 @@ builtInFunctions:POWER_FUNC LPAREN numExpression COMMA numExpression RPAREN
              (SIN_FUNC | COS_FUNC | TAN_FUNC | CTAN_FUNC )
               LPAREN numExpression RPAREN;
 
-// Return
-returnStatement
-    : RETURN expression
-    ;
 
 ifStatement: IF LPAREN boolExpression RPAREN (statement | block)
              (ELSE_IF LPAREN boolExpression RPAREN (statement | block))*
@@ -123,15 +133,6 @@ whileLoop:
 
 // Display
 displayStatement: DISPLAY expression (',' expression)*;
-
-// Parameters and Arguments
-parameter
-    : typedParameter (COMMA typedParameter)*
-    ;
-
-typedParameter
-    : IDENTIFIER typeAnnotation
-    ;
 
 // Blocks
 block: LBRACE statement+ RBRACE ;

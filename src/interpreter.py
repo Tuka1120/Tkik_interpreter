@@ -4,19 +4,41 @@ from EnglishLangLexer import EnglishLangLexer
 from EnglishLangParser import EnglishLangParser
 from EnglishLangParserVisitor import EnglishLangParserVisitor
 
-class Environment:
-    def __init__(self):
-        self.variables = {}
-        self.functions = {}
-
 class BreakStatement:
     pass
 
+class FunctionReturn(Exception):
+    def __init__(self, value):
+        self.value = value
 
 class Interpreter(EnglishLangParserVisitor):
     def __init__(self):
-        self.env = Environment()
+        super().__init__()
+        self.global_env = {}
+        self.env_stack = [self.global_env]
+        self.variables = {}
+        self.functions = {}        
         self.output_lines = []
+        self.call_stack = []
+
+    def current_env(self):
+        return self.env_stack[-1]
+
+    def push_env(self):
+        self.env_stack.append({})
+
+    def pop_env(self):
+        self.env_stack.pop()
+
+    def set_var(self, name, value):
+        env = self.current_env()
+        env[name] = value
+
+    def get_var(self, name):
+        for env in reversed(self.env_stack):
+            if name in env:
+                return env[name]
+        raise Exception(f"Variable '{name}' is not defined")
 
     def visitProgram(self, ctx):
         for stmt in ctx.statement():
@@ -47,8 +69,65 @@ class Interpreter(EnglishLangParserVisitor):
         else:
             raise Exception(f"Unknown type '{declared_type}' for variable '{name}'")
 
-        self.env.variables[name] = value
+        self.variables[name] = value
         return None
+
+    def visitFunctionDeclaration(self, ctx):
+        name = ctx.IDENTIFIER().getText()
+        param_list = []
+
+        if ctx.parameter():
+            for typed_param in ctx.parameter().typedParameter():
+                param_name = typed_param.IDENTIFIER().getText()
+                param_list.append(param_name)
+
+        body = ctx.block()
+        self.functions[name] = {
+            "params": param_list,
+            "body": body
+        }
+        return None
+
+    def visitFunctionCall(self, ctx):
+        name = ctx.IDENTIFIER().getText()
+        print("New visitFunctionCall reached")
+
+        if name not in self.functions:
+            raise Exception(f"Function '{name}' is not defined")
+
+        func = self.functions[name]
+        if 'params' not in func or 'body' not in func:
+            print("Functions dict:", self.functions)
+            raise Exception(f"Function '{name}' is not properly defined")
+
+        params = func['params']
+        body = func['body']
+
+        # Evaluate the arguments
+        args = [self.visit(expr) for expr in ctx.expression()]
+        if len(args) != len(params):
+            raise Exception(f"Function '{name}' expects {len(params)} arguments, got {len(args)}")
+
+        # Save current variable scope
+        old_scope = self.variables.copy()
+
+        # Assign arguments to parameters
+        for param, arg in zip(params, args):
+            self.variables[param] = arg
+
+        try:
+            self.visit(body)
+        except FunctionReturn as ret:
+            self.variables = old_scope  # Restore scope
+            return ret.value
+
+        self.variables = old_scope  # Restore scope
+        return None  # If no return statement
+
+    
+    def visitReturnStatement(self, ctx):
+        value = self.visit(ctx.expression())
+        raise FunctionReturn(value)
 
 
     def visitAssignment(self, ctx):
@@ -59,18 +138,18 @@ class Interpreter(EnglishLangParserVisitor):
 
     def visitReassignment(self, ctx):
         name = ctx.IDENTIFIER().getText()
-        if name not in self.env.variables:
+        if name not in self.variables:
             raise Exception(f"Variable '{name}' not defined.")
         value = self.visit(ctx.numExpression())
         if ctx.ADD_TO():
-            self.env.variables[name] += value
+            self.variables[name] += value
         elif ctx.SUBTRACT_FROM():
-            self.env.variables[name] -= value
+            self.variables[name] -= value
         elif ctx.TIMES():
-            self.env.variables[name] *= value
+            self.variables[name] *= value
         elif ctx.DIVIDE_FROM():
-            self.env.variables[name] /= value
-        return self.env.variables[name]
+            self.variables[name] /= value
+        return self.variables[name]
 
     def visitDisplayStatement(self, ctx):
         expressions = ctx.expression()
@@ -116,7 +195,7 @@ class Interpreter(EnglishLangParserVisitor):
             return float(ctx.NUMBER().getText())
         elif ctx.IDENTIFIER():
             name = ctx.IDENTIFIER().getText()
-            return self.env.variables.get(name, 0)
+            return self.variables.get(name, 0)
         elif ctx.STRING():
             return ctx.STRING().getText().strip('"')
         elif ctx.numExpression():
@@ -166,7 +245,7 @@ class Interpreter(EnglishLangParserVisitor):
 
     def visitLogicIdentifier(self, ctx):
         name = ctx.IDENTIFIER().getText()
-        value = self.env.variables.get(name, False)
+        value = self.variables.get(name, False)
         return not bool(value) if ctx.NOT() else bool(value)
     
     def visitStatement(self, ctx):
@@ -289,10 +368,6 @@ class Interpreter(EnglishLangParserVisitor):
         elif op == '>=': return left >= right
         else: raise Exception(f"Unknown operator {op}")
 
-    def visitFunctionCall(self, ctx):
-        name = ctx.IDENTIFIER().getText()
-        print(f"Function '{name}' called (args ignored in basic interpreter).")
-
     def visitExpression(self, ctx):
         if ctx.numExpression():
             return self.visit(ctx.numExpression())
@@ -302,5 +377,5 @@ class Interpreter(EnglishLangParserVisitor):
             return ctx.STRING().getText().strip('"')
         elif ctx.IDENTIFIER():
             name = ctx.IDENTIFIER().getText()
-            return self.env.variables.get(name, 0)
+            return self.variables.get(name, 0)
         return None

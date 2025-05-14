@@ -125,6 +125,33 @@ class EnglishLangParserListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by EnglishLangParser#parameter.
+    def enterParameter(self, ctx:EnglishLangParser.ParameterContext):
+        pass
+
+    # Exit a parse tree produced by EnglishLangParser#parameter.
+    def exitParameter(self, ctx:EnglishLangParser.ParameterContext):
+        pass
+
+
+    # Enter a parse tree produced by EnglishLangParser#typedParameter.
+    def enterTypedParameter(self, ctx:EnglishLangParser.TypedParameterContext):
+        pass
+
+    # Exit a parse tree produced by EnglishLangParser#typedParameter.
+    def exitTypedParameter(self, ctx:EnglishLangParser.TypedParameterContext):
+        pass
+
+
+    # Enter a parse tree produced by EnglishLangParser#returnStatement.
+    def enterReturnStatement(self, ctx:EnglishLangParser.ReturnStatementContext):
+        pass
+
+    # Exit a parse tree produced by EnglishLangParser#returnStatement.
+    def exitReturnStatement(self, ctx:EnglishLangParser.ReturnStatementContext):
+        pass
+
+
     # Enter a parse tree produced by EnglishLangParser#functionCall.
     def enterFunctionCall(self, ctx:EnglishLangParser.FunctionCallContext):
         pass
@@ -140,15 +167,6 @@ class EnglishLangParserListener(ParseTreeListener):
 
     # Exit a parse tree produced by EnglishLangParser#builtInFunctions.
     def exitBuiltInFunctions(self, ctx:EnglishLangParser.BuiltInFunctionsContext):
-        pass
-
-
-    # Enter a parse tree produced by EnglishLangParser#returnStatement.
-    def enterReturnStatement(self, ctx:EnglishLangParser.ReturnStatementContext):
-        pass
-
-    # Exit a parse tree produced by EnglishLangParser#returnStatement.
-    def exitReturnStatement(self, ctx:EnglishLangParser.ReturnStatementContext):
         pass
 
 
@@ -230,24 +248,6 @@ class EnglishLangParserListener(ParseTreeListener):
 
     # Exit a parse tree produced by EnglishLangParser#displayStatement.
     def exitDisplayStatement(self, ctx:EnglishLangParser.DisplayStatementContext):
-        pass
-
-
-    # Enter a parse tree produced by EnglishLangParser#parameter.
-    def enterParameter(self, ctx:EnglishLangParser.ParameterContext):
-        pass
-
-    # Exit a parse tree produced by EnglishLangParser#parameter.
-    def exitParameter(self, ctx:EnglishLangParser.ParameterContext):
-        pass
-
-
-    # Enter a parse tree produced by EnglishLangParser#typedParameter.
-    def enterTypedParameter(self, ctx:EnglishLangParser.TypedParameterContext):
-        pass
-
-    # Exit a parse tree produced by EnglishLangParser#typedParameter.
-    def exitTypedParameter(self, ctx:EnglishLangParser.TypedParameterContext):
         pass
 
 
