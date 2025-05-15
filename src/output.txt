@@ -1,21 +1,28 @@
-42.0
+50.0
 9 Sum:  18.0
 Hello Alice
 True
 a is less than b and c
-0
-1
-2
-3
-Odd: 10
-Odd: 9
-Odd: 8
-Odd: 7
-Odd: 6
-Odd: 5
-Odd: 4
+Even: 0
+Odd: 1
+Even: 2
 Odd: 3
-Odd: 2
+Even: 4
+Odd: 5
+Even: 6
+Odd: 7
+Even: 8
+Odd: 9
+Even: 10
+Even: 10
+Odd: 9
+Even: 8
+Odd: 7
+Even: 6
+Odd: 5
+Even: 4
+Odd: 3
+Even: 2
 Odd: 1
 Loop ran 10 times
 8

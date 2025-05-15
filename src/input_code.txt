@@ -1,7 +1,7 @@
 Start Program
     Set x to 4 int
     Set y to 5 int
-    Display (y + x * 4) * 2
+    Display (y + x * 5) * 2
     Display x + y, "Sum: ", (x + y) * 2
 
 
@@ -26,16 +26,19 @@ Start Program
 
 
     Set i to 0 int
-    While (i <= 3)
+    While (i <= 10)
     {
-        Display i
+        If (i % 2 == 0)
+            Display "Even:", i
+        Else
+            Display "Odd:", i
         Set i to i + 1 int
     }
 
     Set i to 0 int
     For (Set j to 10 int; j > 0; Set j to j - 1 int)
     {
-        If (j / 2 == 0)
+        If (j % 2 == 0)
             Display "Even:", j
         Else
             Display "Odd:", j
