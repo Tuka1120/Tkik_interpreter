@@ -53,5 +53,18 @@ Start Program
     } End Function
 
     factorial(5)
+
+    Define Function addNumbers (num1 int, num2 int){
+        Set result to num1 + num2 int
+        Return result
+    }End Function
+
+    Call addNumbers (5, 3)
+
+    Define Function printMessage (message string){ 
+        Return message
+    }End Function
+
+    Call printMessage ("Hello, World!")
     
 End Program

@@ -42,7 +42,9 @@ class Interpreter(EnglishLangParserVisitor):
 
     def visitProgram(self, ctx):
         for stmt in ctx.statement():
-            self.visit(stmt) 
+            result = self.visit(stmt)
+            if result is not None and not isinstance(result, BreakStatement):
+                self.output_lines.append(str(result))
         return self.output_lines
 
     def visitVariableDeclaration(self, ctx):
@@ -145,14 +147,12 @@ class Interpreter(EnglishLangParserVisitor):
         print(f"Function {name} returned: {return_value}")
         return return_value
 
-
     def visitIdentifier(self, ctx):
         var_name = ctx.getText()
         if var_name in self.variables:
             return self.variables[var_name]
         else:
             raise Exception(f"Undefined variable: {var_name}")
-
     
     def visitReturnStatement(self, ctx):
         value = self.visit(ctx.expression())
@@ -164,37 +164,15 @@ class Interpreter(EnglishLangParserVisitor):
             self.visit(stmt)
         self.pop_env()
 
-    def visitAssignment(self, ctx):
-        name = ctx.IDENTIFIER().getText()
-        value = self.visit(ctx.expression())
+    def visitStatement(self, ctx):
+        result = self.visitChildren(ctx)
 
-        # Search for variable in all available scopes (from top to bottom)
-        for env in reversed(self.env_stack):
-            if name in env:
-                expected_type = self.var_types.get(name, "unknown") if hasattr(self, "var_types") else "unknown"
+        # If the statement is a standalone function call and returned a value, output it
+        if ctx.functionCall() and result is not None:
+            print("DEBUG: Standalone function call result:", result)
+            self.output_lines.append(f"Result: {result}")
 
-                if expected_type == 'int':
-                    value = int(value)
-                elif expected_type == 'float':
-                    value = float(value)
-                elif expected_type == 'bool':
-                    if isinstance(value, str):
-                        value = value.lower() == 'true'
-                    else:
-                        value = bool(value)
-                elif expected_type == 'string':
-                    value = str(value)
-                elif expected_type == 'matrix':
-                    if not isinstance(value, list) or not all(isinstance(row, list) for row in value):
-                        raise Exception(f"Invalid matrix assignment to variable '{name}'")
-                # You can add type mismatch error if needed
-
-                env[name] = value
-                return value
-
-        raise Exception(f"Variable '{name}' not declared")
-
-
+        return result
 
     def visitReassignment(self, ctx):
         name = ctx.IDENTIFIER().getText()
@@ -217,7 +195,7 @@ class Interpreter(EnglishLangParserVisitor):
         display_output = ' '.join(str(r) for r in results)
         print("DEBUG: Displaying", results)
         self.output_lines.append(display_output)
-        return display_output
+        return None
 
     def visitNumExpression(self, ctx):
         if ctx.getChildCount() == 3:
