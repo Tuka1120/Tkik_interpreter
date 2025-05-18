@@ -31,16 +31,16 @@ def main():
     try:
         tree = parser.program()
         visitor = Interpreter()
-        output_lines = visitor.visit(tree)
+        output = visitor.visit(tree)
     except SyntaxError as e:
         print(e)
         return
     
     with open(output_path, 'w', encoding='utf-8') as out_file:
-        if isinstance(output_lines, list):
-            out_file.write("\n".join(str(line) for line in output_lines))
+        if isinstance(output, list):
+            out_file.write("\n".join(str(line) for line in output))
         else:
-            out_file.write(str(output_lines))
+            out_file.write(str(output))
 
     print("Parsed successfully.")
 

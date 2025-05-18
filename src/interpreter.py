@@ -69,8 +69,24 @@ class Interpreter(EnglishLangParserVisitor):
         else:
             raise Exception(f"Unknown type '{declared_type}' for variable '{name}'")
 
-        self.variables[name] = value
+        # Store in the current scope
+        self.env_stack[-1][name] = value
+
+        # Optionally keep track of declared types if needed later
+        if not hasattr(self, "var_types"):
+            self.var_types = {}
+        self.var_types[name] = declared_type
+
         return None
+
+    
+    def lookup_variable(self, name):
+        for scope in reversed(self.env_stack):  # Look from local to global
+            if name in scope:
+                return scope[name]
+        raise Exception(f"Variable '{name}' not found in any scope")
+
+
 
     def visitFunctionDeclaration(self, ctx):
         name = ctx.IDENTIFIER().getText()
@@ -89,49 +105,96 @@ class Interpreter(EnglishLangParserVisitor):
         return None
 
     def visitFunctionCall(self, ctx):
-        name = ctx.IDENTIFIER().getText()
         print("New visitFunctionCall reached")
 
-        if name not in self.functions:
-            raise Exception(f"Function '{name}' is not defined")
+        func_name = ctx.IDENTIFIER().getText()
+        args = []
 
+        if ctx.argumentList():
+            for expr in ctx.argumentList().expression():
+                arg_val = self.visit(expr)
+                args.append(arg_val)
+
+        print(f"Calling function: {func_name} with args: {args}")
+        result = self.callFunction(func_name, args)
+        return result        
+
+    def callFunction(self, name, args):
         func = self.functions[name]
-        if 'params' not in func or 'body' not in func:
-            print("Functions dict:", self.functions)
-            raise Exception(f"Function '{name}' is not properly defined")
+        param_names = func["params"]
+        body = func["body"]
 
-        params = func['params']
-        body = func['body']
+        if len(param_names) != len(args):
+            raise Exception(f"Function '{name}' expects {len(param_names)} args, got {len(args)}")
 
-        args = [self.visit(expr) for expr in ctx.expression()]
-        if len(args) != len(params):
-            raise Exception(f"Function '{name}' expects {len(params)} arguments, got {len(args)}")
-
-        old_scope = self.variables.copy()
-
-        for param, arg in zip(params, args):
-            self.variables[param] = arg
+        # Create new local scope
+        local_scope = dict(zip(param_names, args))
+        self.env_stack.append(local_scope)
+        self.call_stack.append(name)
 
         try:
             self.visit(body)
-        except FunctionReturn as ret:
-            self.variables = old_scope  
-            return ret.value
+        except FunctionReturn as fr:
+            return_value = fr.value
+        else:
+            return_value = None
+        finally:
+            self.call_stack.pop()
+            self.env_stack.pop()
 
-        self.variables = old_scope  
-        return None 
+        print(f"Function {name} returned: {return_value}")
+        return return_value
+
+
+    def visitIdentifier(self, ctx):
+        var_name = ctx.getText()
+        if var_name in self.variables:
+            return self.variables[var_name]
+        else:
+            raise Exception(f"Undefined variable: {var_name}")
 
     
     def visitReturnStatement(self, ctx):
         value = self.visit(ctx.expression())
         raise FunctionReturn(value)
 
+    def visitBlock(self, ctx):
+        self.push_env()
+        for stmt in ctx.statement():
+            self.visit(stmt)
+        self.pop_env()
 
     def visitAssignment(self, ctx):
         name = ctx.IDENTIFIER().getText()
         value = self.visit(ctx.expression())
-        self.global_scope[name] = value
-        return None 
+
+        # Search for variable in all available scopes (from top to bottom)
+        for env in reversed(self.env_stack):
+            if name in env:
+                expected_type = self.var_types.get(name, "unknown") if hasattr(self, "var_types") else "unknown"
+
+                if expected_type == 'int':
+                    value = int(value)
+                elif expected_type == 'float':
+                    value = float(value)
+                elif expected_type == 'bool':
+                    if isinstance(value, str):
+                        value = value.lower() == 'true'
+                    else:
+                        value = bool(value)
+                elif expected_type == 'string':
+                    value = str(value)
+                elif expected_type == 'matrix':
+                    if not isinstance(value, list) or not all(isinstance(row, list) for row in value):
+                        raise Exception(f"Invalid matrix assignment to variable '{name}'")
+                # You can add type mismatch error if needed
+
+                env[name] = value
+                return value
+
+        raise Exception(f"Variable '{name}' not declared")
+
+
 
     def visitReassignment(self, ctx):
         name = ctx.IDENTIFIER().getText()
@@ -192,12 +255,15 @@ class Interpreter(EnglishLangParserVisitor):
             return float(ctx.NUMBER().getText())
         elif ctx.IDENTIFIER():
             name = ctx.IDENTIFIER().getText()
-            return self.variables.get(name, 0)
+            return self.lookup_variable(name)
         elif ctx.STRING():
             return ctx.STRING().getText().strip('"')
         elif ctx.numExpression():
             return self.visit(ctx.numExpression())
+        elif ctx.functionCall():
+            return self.visit(ctx.functionCall())  # 🔥 THIS enables recursion
         return 0
+
     
     def visitNumComparison(self, ctx):
         left = self.visit(ctx.numExpression(0))
@@ -371,5 +437,5 @@ class Interpreter(EnglishLangParserVisitor):
             return ctx.STRING().getText().strip('"')
         elif ctx.IDENTIFIER():
             name = ctx.IDENTIFIER().getText()
-            return self.variables.get(name, 0)
+            return self.lookup_variable(name)
         return None

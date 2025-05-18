@@ -161,6 +161,15 @@ class EnglishLangParserListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by EnglishLangParser#argumentList.
+    def enterArgumentList(self, ctx:EnglishLangParser.ArgumentListContext):
+        pass
+
+    # Exit a parse tree produced by EnglishLangParser#argumentList.
+    def exitArgumentList(self, ctx:EnglishLangParser.ArgumentListContext):
+        pass
+
+
     # Enter a parse tree produced by EnglishLangParser#builtInFunctions.
     def enterBuiltInFunctions(self, ctx:EnglishLangParser.BuiltInFunctionsContext):
         pass

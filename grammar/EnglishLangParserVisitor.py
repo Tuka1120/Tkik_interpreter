@@ -94,6 +94,11 @@ class EnglishLangParserVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by EnglishLangParser#argumentList.
+    def visitArgumentList(self, ctx:EnglishLangParser.ArgumentListContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by EnglishLangParser#builtInFunctions.
     def visitBuiltInFunctions(self, ctx:EnglishLangParser.BuiltInFunctionsContext):
         return self.visitChildren(ctx)

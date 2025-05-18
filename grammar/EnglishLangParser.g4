@@ -10,8 +10,8 @@ statement:
       variableDeclaration
     | reassignment
     | functionDeclaration
-    | returnStatement
     | functionCall
+    | returnStatement
     | displayStatement
     | ifStatement
     | loopStatement
@@ -35,7 +35,7 @@ loopStatements:
 
 // Variable Declaration & Assignment
 variableDeclaration
-    : SET IDENTIFIER TO expression typeAnnotation
+    : SET? IDENTIFIER TO expression typeAnnotation
     ;
 
 matrixExpression: (INVERT_MATRIX)? matrixAtom (TRANSPOSITION)?;
@@ -49,7 +49,9 @@ stringExpression: (STRING | IDENTIFIER) ( PLUS (STRING | IDENTIFIER))*;
 
 
 expression:
-      numExpression
+      functionCall
+    | builtInFunctions
+    | numExpression
     | boolExpression
     | matrixExpression
     | stringExpression
@@ -83,8 +85,11 @@ returnStatement
 
 // Function Call
 functionCall
-    : builtInFunctions
-    | CALL? IDENTIFIER LPAREN (expression (COMMA expression)*)? RPAREN
+    : CALL? IDENTIFIER LPAREN argumentList? RPAREN
+    ;
+
+argumentList
+    : expression (COMMA expression)*
     ;
 
 
@@ -145,7 +150,8 @@ term: term (MULTIPLY|DIVIDED_BY|MODULO) factor
     | factor;
 
 factor
-    : NUMBER
+    : functionCall
+    | NUMBER
     | IDENTIFIER
     | STRING
     | operation
