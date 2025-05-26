@@ -179,23 +179,43 @@ class EnglishLangParserVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by EnglishLangParser#stringComparison.
-    def visitStringComparison(self, ctx:EnglishLangParser.StringComparisonContext):
+    # Visit a parse tree produced by EnglishLangParser#boolExpression.
+    def visitBoolExpression(self, ctx:EnglishLangParser.BoolExpressionContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by EnglishLangParser#falseLiteral.
-    def visitFalseLiteral(self, ctx:EnglishLangParser.FalseLiteralContext):
+    # Visit a parse tree produced by EnglishLangParser#logicOr.
+    def visitLogicOr(self, ctx:EnglishLangParser.LogicOrContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by EnglishLangParser#logicBinary.
-    def visitLogicBinary(self, ctx:EnglishLangParser.LogicBinaryContext):
+    # Visit a parse tree produced by EnglishLangParser#logicAnd.
+    def visitLogicAnd(self, ctx:EnglishLangParser.LogicAndContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by EnglishLangParser#logicNot.
+    def visitLogicNot(self, ctx:EnglishLangParser.LogicNotContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by EnglishLangParser#logicPrimaryWrap.
+    def visitLogicPrimaryWrap(self, ctx:EnglishLangParser.LogicPrimaryWrapContext):
         return self.visitChildren(ctx)
 
 
     # Visit a parse tree produced by EnglishLangParser#numComparison.
     def visitNumComparison(self, ctx:EnglishLangParser.NumComparisonContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by EnglishLangParser#stringComparison.
+    def visitStringComparison(self, ctx:EnglishLangParser.StringComparisonContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by EnglishLangParser#matrixComparison.
+    def visitMatrixComparison(self, ctx:EnglishLangParser.MatrixComparisonContext):
         return self.visitChildren(ctx)
 
 
@@ -209,13 +229,13 @@ class EnglishLangParserVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by EnglishLangParser#logicIdentifier.
-    def visitLogicIdentifier(self, ctx:EnglishLangParser.LogicIdentifierContext):
+    # Visit a parse tree produced by EnglishLangParser#falseLiteral.
+    def visitFalseLiteral(self, ctx:EnglishLangParser.FalseLiteralContext):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by EnglishLangParser#matrixComparison.
-    def visitMatrixComparison(self, ctx:EnglishLangParser.MatrixComparisonContext):
+    # Visit a parse tree produced by EnglishLangParser#logicIdentifier.
+    def visitLogicIdentifier(self, ctx:EnglishLangParser.LogicIdentifierContext):
         return self.visitChildren(ctx)
 
 

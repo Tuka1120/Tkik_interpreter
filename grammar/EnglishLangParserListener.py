@@ -314,30 +314,48 @@ class EnglishLangParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by EnglishLangParser#stringComparison.
-    def enterStringComparison(self, ctx:EnglishLangParser.StringComparisonContext):
+    # Enter a parse tree produced by EnglishLangParser#boolExpression.
+    def enterBoolExpression(self, ctx:EnglishLangParser.BoolExpressionContext):
         pass
 
-    # Exit a parse tree produced by EnglishLangParser#stringComparison.
-    def exitStringComparison(self, ctx:EnglishLangParser.StringComparisonContext):
-        pass
-
-
-    # Enter a parse tree produced by EnglishLangParser#falseLiteral.
-    def enterFalseLiteral(self, ctx:EnglishLangParser.FalseLiteralContext):
-        pass
-
-    # Exit a parse tree produced by EnglishLangParser#falseLiteral.
-    def exitFalseLiteral(self, ctx:EnglishLangParser.FalseLiteralContext):
+    # Exit a parse tree produced by EnglishLangParser#boolExpression.
+    def exitBoolExpression(self, ctx:EnglishLangParser.BoolExpressionContext):
         pass
 
 
-    # Enter a parse tree produced by EnglishLangParser#logicBinary.
-    def enterLogicBinary(self, ctx:EnglishLangParser.LogicBinaryContext):
+    # Enter a parse tree produced by EnglishLangParser#logicOr.
+    def enterLogicOr(self, ctx:EnglishLangParser.LogicOrContext):
         pass
 
-    # Exit a parse tree produced by EnglishLangParser#logicBinary.
-    def exitLogicBinary(self, ctx:EnglishLangParser.LogicBinaryContext):
+    # Exit a parse tree produced by EnglishLangParser#logicOr.
+    def exitLogicOr(self, ctx:EnglishLangParser.LogicOrContext):
+        pass
+
+
+    # Enter a parse tree produced by EnglishLangParser#logicAnd.
+    def enterLogicAnd(self, ctx:EnglishLangParser.LogicAndContext):
+        pass
+
+    # Exit a parse tree produced by EnglishLangParser#logicAnd.
+    def exitLogicAnd(self, ctx:EnglishLangParser.LogicAndContext):
+        pass
+
+
+    # Enter a parse tree produced by EnglishLangParser#logicNot.
+    def enterLogicNot(self, ctx:EnglishLangParser.LogicNotContext):
+        pass
+
+    # Exit a parse tree produced by EnglishLangParser#logicNot.
+    def exitLogicNot(self, ctx:EnglishLangParser.LogicNotContext):
+        pass
+
+
+    # Enter a parse tree produced by EnglishLangParser#logicPrimaryWrap.
+    def enterLogicPrimaryWrap(self, ctx:EnglishLangParser.LogicPrimaryWrapContext):
+        pass
+
+    # Exit a parse tree produced by EnglishLangParser#logicPrimaryWrap.
+    def exitLogicPrimaryWrap(self, ctx:EnglishLangParser.LogicPrimaryWrapContext):
         pass
 
 
@@ -347,6 +365,24 @@ class EnglishLangParserListener(ParseTreeListener):
 
     # Exit a parse tree produced by EnglishLangParser#numComparison.
     def exitNumComparison(self, ctx:EnglishLangParser.NumComparisonContext):
+        pass
+
+
+    # Enter a parse tree produced by EnglishLangParser#stringComparison.
+    def enterStringComparison(self, ctx:EnglishLangParser.StringComparisonContext):
+        pass
+
+    # Exit a parse tree produced by EnglishLangParser#stringComparison.
+    def exitStringComparison(self, ctx:EnglishLangParser.StringComparisonContext):
+        pass
+
+
+    # Enter a parse tree produced by EnglishLangParser#matrixComparison.
+    def enterMatrixComparison(self, ctx:EnglishLangParser.MatrixComparisonContext):
+        pass
+
+    # Exit a parse tree produced by EnglishLangParser#matrixComparison.
+    def exitMatrixComparison(self, ctx:EnglishLangParser.MatrixComparisonContext):
         pass
 
 
@@ -368,21 +404,21 @@ class EnglishLangParserListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by EnglishLangParser#falseLiteral.
+    def enterFalseLiteral(self, ctx:EnglishLangParser.FalseLiteralContext):
+        pass
+
+    # Exit a parse tree produced by EnglishLangParser#falseLiteral.
+    def exitFalseLiteral(self, ctx:EnglishLangParser.FalseLiteralContext):
+        pass
+
+
     # Enter a parse tree produced by EnglishLangParser#logicIdentifier.
     def enterLogicIdentifier(self, ctx:EnglishLangParser.LogicIdentifierContext):
         pass
 
     # Exit a parse tree produced by EnglishLangParser#logicIdentifier.
     def exitLogicIdentifier(self, ctx:EnglishLangParser.LogicIdentifierContext):
-        pass
-
-
-    # Enter a parse tree produced by EnglishLangParser#matrixComparison.
-    def enterMatrixComparison(self, ctx:EnglishLangParser.MatrixComparisonContext):
-        pass
-
-    # Exit a parse tree produced by EnglishLangParser#matrixComparison.
-    def exitMatrixComparison(self, ctx:EnglishLangParser.MatrixComparisonContext):
         pass
 
 

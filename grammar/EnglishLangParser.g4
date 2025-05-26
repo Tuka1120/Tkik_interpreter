@@ -166,18 +166,33 @@ reassignment: IDENTIFIER ((ADD_TO STRING | ADD_TO numExpression)
                           | TIMES numExpression)
                SEMICOLON;
 
-
-// Conditions
 boolExpression
-    : numExpression comparisonOp numExpression                            #numComparison
-    | stringExpression (EQUALS | NOT_EQUALS) stringExpression             #stringComparison
-    | matrixExpression (EQUALS | NOT_EQUALS) matrixExpression             #matrixComparison
-    | boolExpression (AND | OR) boolExpression                            #logicBinary
-    | NOT? LPAREN boolExpression RPAREN                                   #logicParen
-    | TRUE_VALUE                                                          #trueLiteral
-    | FALSE_VALUE                                                         #falseLiteral
-    | NOT? IDENTIFIER                                                     #logicIdentifier
+    : boolOrExpression
     ;
+
+boolOrExpression
+    : boolAndExpression (OR boolAndExpression)*       #logicOr
+    ;
+
+boolAndExpression
+    : boolNotExpression (AND boolNotExpression)*      #logicAnd
+    ;
+
+boolNotExpression
+    : NOT boolNotExpression                           #logicNot
+    | boolPrimary                                     #logicPrimaryWrap
+    ;
+
+boolPrimary
+    : numExpression comparisonOp numExpression        #numComparison
+    | stringExpression (EQUALS | NOT_EQUALS) stringExpression   #stringComparison
+    | matrixExpression (EQUALS | NOT_EQUALS) matrixExpression   #matrixComparison
+    | LPAREN boolExpression RPAREN                    #logicParen
+    | TRUE_VALUE                                      #trueLiteral
+    | FALSE_VALUE                                     #falseLiteral
+    | IDENTIFIER                                      #logicIdentifier
+    ;
+
 
 // Comparison Operators
 comparisonOp

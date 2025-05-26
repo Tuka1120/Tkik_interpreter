@@ -261,22 +261,29 @@ class Interpreter(EnglishLangParserVisitor):
         op = ctx.getChild(1).getText()
         return (left == right) if op == "==" else (left != right)
 
-    def visitLogicBinary(self, ctx):
-        left = self.visit(ctx.boolExpression(0))
-        right = self.visit(ctx.boolExpression(1))
-        op = ctx.getChild(1).getText()
-        if op == "and":
-            return bool(left) and bool(right)
-        elif op == "or":
-            return bool(left) or bool(right)
-        else:
-            raise Exception(f"Unsupported logical operator: {op}")
+    def visitBoolExpression(self, ctx):
+        return self.visitChildren(ctx)
+
+    def visitLogicOr(self, ctx):
+        for i in range(len(ctx.boolAndExpression())):
+            if self.visit(ctx.boolAndExpression(i)):
+                return True
+        return False
+
+    def visitLogicAnd(self, ctx):
+        for i in range(len(ctx.boolNotExpression())):
+            if not self.visit(ctx.boolNotExpression(i)):
+                return False
+        return True
+
+    def visitLogicNot(self, ctx):
+        return not self.visit(ctx.boolNotExpression())
+
+    def visitLogicPrimaryWrap(self, ctx):
+        return self.visit(ctx.boolPrimary())
 
     def visitLogicParen(self, ctx):
-        value = self.visit(ctx.boolExpression())
-        if ctx.NOT():
-            return not bool(value)
-        return bool(value)
+        return self.visit(ctx.boolExpression())
 
     def visitTrueLiteral(self, ctx):
         return True
@@ -286,9 +293,8 @@ class Interpreter(EnglishLangParserVisitor):
 
     def visitLogicIdentifier(self, ctx):
         name = ctx.IDENTIFIER().getText()
-        value = self.variables.get(name, False)
-        return not bool(value) if ctx.NOT() else bool(value)
-    
+        return bool(self.lookup_variable(name))
+
     def visitStatement(self, ctx):
         return self.visitChildren(ctx)
 
