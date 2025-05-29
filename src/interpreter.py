@@ -173,6 +173,13 @@ class Interpreter(EnglishLangParserVisitor):
             self.output_lines.append(f"Result: {result}")
 
         return result
+    
+    def visitUnaryPlus(self, ctx):
+        return +self.visit(ctx.factor())
+
+    def visitUnaryMinus(self, ctx):
+        return -self.visit(ctx.factor())
+
 
     def visitReassignment(self, ctx):
         name = ctx.IDENTIFIER().getText()
@@ -228,19 +235,30 @@ class Interpreter(EnglishLangParserVisitor):
                 return left % right
         return self.visit(ctx.getChild(0))
 
-    def visitFactor(self, ctx):
-        if ctx.NUMBER():
-            return float(ctx.NUMBER().getText())
-        elif ctx.IDENTIFIER():
-            name = ctx.IDENTIFIER().getText()
-            return self.lookup_variable(name)
-        elif ctx.STRING():
-            return ctx.STRING().getText().strip('"')
-        elif ctx.numExpression():
-            return self.visit(ctx.numExpression())
-        elif ctx.functionCall():
-            return self.visit(ctx.functionCall())  # 🔥 THIS enables recursion
-        return 0
+    def visitUnaryPlus(self, ctx):
+        return +self.visit(ctx.factor())
+
+    def visitUnaryMinus(self, ctx):
+        return -self.visit(ctx.factor())
+
+    def visitFactorNumber(self, ctx):
+        return float(ctx.NUMBER().getText())
+
+    def visitFactorIdentifier(self, ctx):
+        name = ctx.IDENTIFIER().getText()
+        return self.lookup_variable(name)
+
+    def visitFactorString(self, ctx):
+        return ctx.STRING().getText().strip('"')
+
+    def visitFactorParens(self, ctx):
+        return self.visit(ctx.numExpression())
+
+    def visitFactorFunctionCall(self, ctx):
+        return self.visit(ctx.functionCall())
+
+    def visitFactorOperation(self, ctx):
+        return self.visit(ctx.operation())
 
     
     def visitNumComparison(self, ctx):

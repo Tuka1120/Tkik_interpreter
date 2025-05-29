@@ -1,5 +1,6 @@
 50.0
 9 Sum:  18.0
+4 0 -5
 Hello Alice
 True
 a is less than b and c

@@ -164,8 +164,43 @@ class EnglishLangParserVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by EnglishLangParser#factor.
-    def visitFactor(self, ctx:EnglishLangParser.FactorContext):
+    # Visit a parse tree produced by EnglishLangParser#unaryPlus.
+    def visitUnaryPlus(self, ctx:EnglishLangParser.UnaryPlusContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by EnglishLangParser#unaryMinus.
+    def visitUnaryMinus(self, ctx:EnglishLangParser.UnaryMinusContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by EnglishLangParser#factorFunctionCall.
+    def visitFactorFunctionCall(self, ctx:EnglishLangParser.FactorFunctionCallContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by EnglishLangParser#factorNumber.
+    def visitFactorNumber(self, ctx:EnglishLangParser.FactorNumberContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by EnglishLangParser#factorIdentifier.
+    def visitFactorIdentifier(self, ctx:EnglishLangParser.FactorIdentifierContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by EnglishLangParser#factorString.
+    def visitFactorString(self, ctx:EnglishLangParser.FactorStringContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by EnglishLangParser#factorOperation.
+    def visitFactorOperation(self, ctx:EnglishLangParser.FactorOperationContext):
+        return self.visitChildren(ctx)
+
+
+    # Visit a parse tree produced by EnglishLangParser#factorParens.
+    def visitFactorParens(self, ctx:EnglishLangParser.FactorParensContext):
         return self.visitChildren(ctx)
 
 

@@ -150,12 +150,14 @@ term: term (MULTIPLY|DIVIDED_BY|MODULO) factor
     | factor;
 
 factor
-    : functionCall
-    | NUMBER
-    | IDENTIFIER
-    | STRING
-    | operation
-    | LPAREN numExpression RPAREN
+    : PLUS factor                              #unaryPlus
+    | MINUS factor                             #unaryMinus
+    | functionCall                             #factorFunctionCall
+    | NUMBER                                   #factorNumber
+    | IDENTIFIER                               #factorIdentifier
+    | STRING                                   #factorString
+    | operation                                #factorOperation
+    | LPAREN numExpression RPAREN              #factorParens
     ;
 
 operation : (IDENTIFIER (INCREMENT | DECREMENT)) | functionCall;

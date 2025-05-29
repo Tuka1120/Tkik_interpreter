@@ -287,12 +287,75 @@ class EnglishLangParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by EnglishLangParser#factor.
-    def enterFactor(self, ctx:EnglishLangParser.FactorContext):
+    # Enter a parse tree produced by EnglishLangParser#unaryPlus.
+    def enterUnaryPlus(self, ctx:EnglishLangParser.UnaryPlusContext):
         pass
 
-    # Exit a parse tree produced by EnglishLangParser#factor.
-    def exitFactor(self, ctx:EnglishLangParser.FactorContext):
+    # Exit a parse tree produced by EnglishLangParser#unaryPlus.
+    def exitUnaryPlus(self, ctx:EnglishLangParser.UnaryPlusContext):
+        pass
+
+
+    # Enter a parse tree produced by EnglishLangParser#unaryMinus.
+    def enterUnaryMinus(self, ctx:EnglishLangParser.UnaryMinusContext):
+        pass
+
+    # Exit a parse tree produced by EnglishLangParser#unaryMinus.
+    def exitUnaryMinus(self, ctx:EnglishLangParser.UnaryMinusContext):
+        pass
+
+
+    # Enter a parse tree produced by EnglishLangParser#factorFunctionCall.
+    def enterFactorFunctionCall(self, ctx:EnglishLangParser.FactorFunctionCallContext):
+        pass
+
+    # Exit a parse tree produced by EnglishLangParser#factorFunctionCall.
+    def exitFactorFunctionCall(self, ctx:EnglishLangParser.FactorFunctionCallContext):
+        pass
+
+
+    # Enter a parse tree produced by EnglishLangParser#factorNumber.
+    def enterFactorNumber(self, ctx:EnglishLangParser.FactorNumberContext):
+        pass
+
+    # Exit a parse tree produced by EnglishLangParser#factorNumber.
+    def exitFactorNumber(self, ctx:EnglishLangParser.FactorNumberContext):
+        pass
+
+
+    # Enter a parse tree produced by EnglishLangParser#factorIdentifier.
+    def enterFactorIdentifier(self, ctx:EnglishLangParser.FactorIdentifierContext):
+        pass
+
+    # Exit a parse tree produced by EnglishLangParser#factorIdentifier.
+    def exitFactorIdentifier(self, ctx:EnglishLangParser.FactorIdentifierContext):
+        pass
+
+
+    # Enter a parse tree produced by EnglishLangParser#factorString.
+    def enterFactorString(self, ctx:EnglishLangParser.FactorStringContext):
+        pass
+
+    # Exit a parse tree produced by EnglishLangParser#factorString.
+    def exitFactorString(self, ctx:EnglishLangParser.FactorStringContext):
+        pass
+
+
+    # Enter a parse tree produced by EnglishLangParser#factorOperation.
+    def enterFactorOperation(self, ctx:EnglishLangParser.FactorOperationContext):
+        pass
+
+    # Exit a parse tree produced by EnglishLangParser#factorOperation.
+    def exitFactorOperation(self, ctx:EnglishLangParser.FactorOperationContext):
+        pass
+
+
+    # Enter a parse tree produced by EnglishLangParser#factorParens.
+    def enterFactorParens(self, ctx:EnglishLangParser.FactorParensContext):
+        pass
+
+    # Exit a parse tree produced by EnglishLangParser#factorParens.
+    def exitFactorParens(self, ctx:EnglishLangParser.FactorParensContext):
         pass
 
 
