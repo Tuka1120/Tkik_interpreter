@@ -35,7 +35,7 @@ loopStatements:
 
 // Variable Declaration & Assignment
 variableDeclaration
-    : SET? IDENTIFIER TO expression typeAnnotation
+    : SET? IDENTIFIER TO expression typeAnnotation?
     ;
 
 matrixExpression: (INVERT_MATRIX)? matrixAtom (TRANSPOSITION)?;
@@ -75,7 +75,7 @@ parameter
     ;
 
 typedParameter
-    : IDENTIFIER typeAnnotation
+    : IDENTIFIER typeAnnotation?
     ;
 
 // Return

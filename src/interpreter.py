@@ -52,8 +52,9 @@ class Interpreter(EnglishLangParserVisitor):
         value = self.visit(ctx.expression())
 
         type_ctx = ctx.typeAnnotation()
-        declared_type = type_ctx.getText().lower() if type_ctx else "unknown"
+        declared_type = type_ctx.getText().lower() if type_ctx else None
 
+        # If type is specified, coerce value
         if declared_type == 'int':
             value = int(value) if isinstance(value, (int, float, str)) else 0
         elif declared_type == 'float':
@@ -68,8 +69,18 @@ class Interpreter(EnglishLangParserVisitor):
         elif declared_type == 'matrix':
             if not isinstance(value, list) or not all(isinstance(row, list) for row in value):
                 raise Exception(f"Invalid matrix assignment to variable '{name}'")
+        elif declared_type is None:
+            # No type given: infer if possible
+            if isinstance(value, str):
+                try:
+                    value = float(value) if '.' in value else int(value)
+                except:
+                    pass  # keep as string
         else:
             raise Exception(f"Unknown type '{declared_type}' for variable '{name}'")
+
+        self.set_var(name, value)
+        return None
 
         # Store in the current scope
         self.env_stack[-1][name] = value
