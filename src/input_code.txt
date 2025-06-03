@@ -79,4 +79,33 @@ Start Program
 
     countdown(10)
 
+    Define Function countup (n int) {
+        For (i to 0; i <= n; i to i + 1) 
+        {
+            Display i
+        }
+    } End Function
+
+    countup(10)
+    
+    Define Function up (n int) {
+        Set i to 0
+        While (i <= n){
+            Display i
+            i to i + 1
+        }
+    } End Function
+
+    up(5)
+
+    Define Function down (n int) {
+        While (0 < n){
+            Display n
+            n to n - 1
+        }
+    } End Function
+
+    down(5)
+    
+
 End Program
