@@ -62,7 +62,7 @@ def serializedATN():
         0,0,36,236,1,0,0,0,38,238,1,0,0,0,40,266,1,0,0,0,42,317,1,0,0,0,
         44,319,1,0,0,0,46,333,1,0,0,0,48,338,1,0,0,0,50,349,1,0,0,0,52,351,
         1,0,0,0,54,366,1,0,0,0,56,375,1,0,0,0,58,383,1,0,0,0,60,394,1,0,
-        0,0,62,418,1,0,0,0,64,423,1,0,0,0,66,425,1,0,0,0,68,442,1,0,0,0,
+        0,0,62,418,1,0,0,0,64,420,1,0,0,0,66,425,1,0,0,0,68,442,1,0,0,0,
         70,444,1,0,0,0,72,452,1,0,0,0,74,463,1,0,0,0,76,484,1,0,0,0,78,486,
         1,0,0,0,80,82,5,1,0,0,81,83,3,2,1,0,82,81,1,0,0,0,83,84,1,0,0,0,
         84,82,1,0,0,0,84,85,1,0,0,0,85,86,1,0,0,0,86,87,5,2,0,0,87,1,1,0,
@@ -169,8 +169,8 @@ def serializedATN():
         0,416,417,5,54,0,0,417,419,1,0,0,0,418,405,1,0,0,0,418,407,1,0,0,
         0,418,409,1,0,0,0,418,410,1,0,0,0,418,411,1,0,0,0,418,412,1,0,0,
         0,418,413,1,0,0,0,418,414,1,0,0,0,419,63,1,0,0,0,420,421,5,70,0,
-        0,421,424,7,5,0,0,422,424,3,32,16,0,423,420,1,0,0,0,423,422,1,0,
-        0,0,424,65,1,0,0,0,425,438,5,70,0,0,426,427,5,34,0,0,427,431,5,56,
+        0,421,423,7,5,0,0,422,424,5,44,0,0,423,422,1,0,0,0,423,424,1,0,0,
+        0,424,65,1,0,0,0,425,438,5,70,0,0,426,427,5,34,0,0,427,431,5,56,
         0,0,428,429,5,34,0,0,429,431,3,58,29,0,430,426,1,0,0,0,430,428,1,
         0,0,0,431,439,1,0,0,0,432,433,5,35,0,0,433,439,3,58,29,0,434,435,
         5,39,0,0,435,439,3,58,29,0,436,437,5,38,0,0,437,439,3,58,29,0,438,
@@ -3531,9 +3531,8 @@ class EnglishLangParser ( Parser ):
         def DECREMENT(self):
             return self.getToken(EnglishLangParser.DECREMENT, 0)
 
-        def functionCall(self):
-            return self.getTypedRuleContext(EnglishLangParser.FunctionCallContext,0)
-
+        def SEMICOLON(self):
+            return self.getToken(EnglishLangParser.SEMICOLON, 0)
 
         def getRuleIndex(self):
             return EnglishLangParser.RULE_operation
@@ -3561,27 +3560,22 @@ class EnglishLangParser ( Parser ):
         self.enterRule(localctx, 64, self.RULE_operation)
         self._la = 0 # Token type
         try:
+            self.enterOuterAlt(localctx, 1)
+            self.state = 420
+            self.match(EnglishLangParser.IDENTIFIER)
+            self.state = 421
+            _la = self._input.LA(1)
+            if not(_la==36 or _la==37):
+                self._errHandler.recoverInline(self)
+            else:
+                self._errHandler.reportMatch(self)
+                self.consume()
             self.state = 423
             self._errHandler.sync(self)
             la_ = self._interp.adaptivePredict(self._input,46,self._ctx)
             if la_ == 1:
-                self.enterOuterAlt(localctx, 1)
-                self.state = 420
-                self.match(EnglishLangParser.IDENTIFIER)
-                self.state = 421
-                _la = self._input.LA(1)
-                if not(_la==36 or _la==37):
-                    self._errHandler.recoverInline(self)
-                else:
-                    self._errHandler.reportMatch(self)
-                    self.consume()
-                pass
-
-            elif la_ == 2:
-                self.enterOuterAlt(localctx, 2)
                 self.state = 422
-                self.functionCall()
-                pass
+                self.match(EnglishLangParser.SEMICOLON)
 
 
         except RecognitionException as re:

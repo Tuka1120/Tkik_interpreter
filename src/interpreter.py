@@ -16,6 +16,7 @@ class Interpreter(EnglishLangParserVisitor):
         super().__init__()
         self.global_env = {}
         self.env_stack = [self.global_env]
+        self.memory = {}
         self.variables = {}
         self.functions = {}        
         self.output_lines = []
@@ -46,6 +47,24 @@ class Interpreter(EnglishLangParserVisitor):
             if result is not None and not isinstance(result, BreakStatement):
                 self.output_lines.append(str(result))
         return self.output_lines
+    
+    def visitAssignment(self, ctx):
+        var_name = ctx.IDENTIFIER().getText()
+        value = self.visit(ctx.expression())
+        var_type = self.visit(ctx.typeIdentifier()) if ctx.typeIdentifier() else None
+
+        if var_name not in self.memory:
+            # Implicit declaration
+            if var_type:
+                self.memory[var_name] = self.cast_value(value, var_type)
+            else:
+                self.memory[var_name] = value
+        else:
+            # Assignment to existing variable
+            self.memory[var_name] = value
+
+        return self.memory[var_name]
+
 
     def visitVariableDeclaration(self, ctx):
         name = ctx.IDENTIFIER().getText()
@@ -80,16 +99,6 @@ class Interpreter(EnglishLangParserVisitor):
             raise Exception(f"Unknown type '{declared_type}' for variable '{name}'")
 
         self.set_var(name, value)
-        return None
-
-        # Store in the current scope
-        self.env_stack[-1][name] = value
-
-        # Optionally keep track of declared types if needed later
-        if not hasattr(self, "var_types"):
-            self.var_types = {}
-        self.var_types[name] = declared_type
-
         return None
 
     
@@ -271,6 +280,21 @@ class Interpreter(EnglishLangParserVisitor):
     def visitFactorOperation(self, ctx):
         return self.visit(ctx.operation())
 
+    def visitOperation(self, ctx):
+        var_name = ctx.IDENTIFIER().getText()
+        if var_name not in self.memory:
+            raise Exception(f"Variable '{var_name}' not defined.")
+
+        current_value = self.memory[var_name]
+        if not isinstance(current_value, (int, float)):
+            raise Exception(f"Cannot increment/decrement non-numeric variable '{var_name}'.")
+
+        if ctx.INCREMENT():
+            self.memory[var_name] = current_value + 1
+        elif ctx.DECREMENT():
+            self.memory[var_name] = current_value - 1
+
+        return self.memory[var_name]
     
     def visitNumComparison(self, ctx):
         left = self.visit(ctx.numExpression(0))

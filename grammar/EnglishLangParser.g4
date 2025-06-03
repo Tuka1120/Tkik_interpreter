@@ -160,7 +160,7 @@ factor
     | LPAREN numExpression RPAREN              #factorParens
     ;
 
-operation : (IDENTIFIER (INCREMENT | DECREMENT)) | functionCall;
+operation : IDENTIFIER (INCREMENT | DECREMENT) SEMICOLON? ;
 
 reassignment: IDENTIFIER ((ADD_TO STRING | ADD_TO numExpression)
                           | SUBTRACT_FROM numExpression
