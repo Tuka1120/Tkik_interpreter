@@ -1,5 +1,4 @@
 Start Program
-
-    Display 5 + + + 5
+    Display + + +
     
 End Program
