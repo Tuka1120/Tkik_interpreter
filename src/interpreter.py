@@ -54,13 +54,11 @@ class Interpreter(EnglishLangParserVisitor):
         var_type = self.visit(ctx.typeIdentifier()) if ctx.typeIdentifier() else None
 
         if var_name not in self.memory:
-            # Implicit declaration
             if var_type:
                 self.memory[var_name] = self.cast_value(value, var_type)
             else:
                 self.memory[var_name] = value
         else:
-            # Assignment to existing variable
             self.memory[var_name] = value
 
         return self.memory[var_name]
@@ -73,7 +71,6 @@ class Interpreter(EnglishLangParserVisitor):
         type_ctx = ctx.typeAnnotation()
         declared_type = type_ctx.getText().lower() if type_ctx else None
 
-        # If type is specified, coerce value
         if declared_type == 'int':
             value = int(value) if isinstance(value, (int, float, str)) else 0
         elif declared_type == 'float':
@@ -89,26 +86,22 @@ class Interpreter(EnglishLangParserVisitor):
             if not isinstance(value, list) or not all(isinstance(row, list) for row in value):
                 raise Exception(f"Invalid matrix assignment to variable '{name}'")
         elif declared_type is None:
-            # No type given: infer if possible
             if isinstance(value, str):
                 try:
                     value = float(value) if '.' in value else int(value)
                 except:
-                    pass  # keep as string
+                    pass  
         else:
             raise Exception(f"Unknown type '{declared_type}' for variable '{name}'")
 
         self.set_var(name, value)
         return None
-
     
     def lookup_variable(self, name):
-        for scope in reversed(self.env_stack):  # Look from local to global
+        for scope in reversed(self.env_stack): 
             if name in scope:
                 return scope[name]
         raise Exception(f"Variable '{name}' not found in any scope")
-
-
 
     def visitFunctionDeclaration(self, ctx):
         name = ctx.IDENTIFIER().getText()
@@ -149,7 +142,6 @@ class Interpreter(EnglishLangParserVisitor):
         if len(param_names) != len(args):
             raise Exception(f"Function '{name}' expects {len(param_names)} args, got {len(args)}")
 
-        # Create new local scope
         local_scope = dict(zip(param_names, args))
         self.env_stack.append(local_scope)
         self.call_stack.append(name)
@@ -187,19 +179,11 @@ class Interpreter(EnglishLangParserVisitor):
     def visitStatement(self, ctx):
         result = self.visitChildren(ctx)
 
-        # If the statement is a standalone function call and returned a value, output it
         if ctx.functionCall() and result is not None:
             print("DEBUG: Standalone function call result:", result)
             self.output_lines.append(f"Result: {result}")
 
         return result
-    
-    def visitUnaryPlus(self, ctx):
-        return +self.visit(ctx.factor())
-
-    def visitUnaryMinus(self, ctx):
-        return -self.visit(ctx.factor())
-
 
     def visitReassignment(self, ctx):
         name = ctx.IDENTIFIER().getText()
@@ -348,24 +332,18 @@ class Interpreter(EnglishLangParserVisitor):
         name = ctx.IDENTIFIER().getText()
         return bool(self.lookup_variable(name))
 
-    def visitStatement(self, ctx):
-        return self.visitChildren(ctx)
-
     def visitIfStatement(self, ctx):
-        # If
         if self.visit(ctx.boolExpression(0)):
             stmt_or_block = ctx.statement(0) or ctx.block(0)
             if stmt_or_block:
                 return self.visit(stmt_or_block)
 
-        # Else If
         for i in range(len(ctx.ELSE_IF())):
             if self.visit(ctx.boolExpression(i + 1)):
                 stmt_or_block = ctx.statement(i + 1) or ctx.block(i + 1)
                 if stmt_or_block:
                     return self.visit(stmt_or_block)
 
-        # Else
         if ctx.ELSE():
             num_ifs = 1 + len(ctx.ELSE_IF())
             stmt_or_block = ctx.statement(num_ifs) or ctx.block(num_ifs)
@@ -375,14 +353,12 @@ class Interpreter(EnglishLangParserVisitor):
         return None
 
     def visitLoopIfStatement(self, ctx):
-        # Main IF condition
         if self.visit(ctx.boolExpression(0)):
             if ctx.loopStatements(0):
                 return self.visit(ctx.loopStatements(0))
             elif ctx.statement(0):
                 return self.visit(ctx.statement(0))
 
-        # ELSE IFs
         for i in range(1, len(ctx.boolExpression())):
             if self.visit(ctx.boolExpression(i)):
                 if ctx.loopStatements(i):
@@ -390,8 +366,7 @@ class Interpreter(EnglishLangParserVisitor):
                 elif ctx.statement(i):
                     return self.visit(ctx.statement(i))
 
-        # ELSE clause
-        if ctx.ELSE():  # Check if ELSE exists
+        if ctx.ELSE(): 
             idx = len(ctx.boolExpression())
             if len(ctx.loopStatements()) > idx:
                 return self.visit(ctx.loopStatements(idx))
