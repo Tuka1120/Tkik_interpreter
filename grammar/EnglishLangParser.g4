@@ -55,10 +55,15 @@ expression:
     | boolExpression
     | matrixExpression
     | stringExpression
+    | scopedIdentifier
     | NUMBER
     | STRING
     | IDENTIFIER
     | '(' expression ')'
+    ;
+
+scopedIdentifier
+    : (PARENT_SCOPE DCOLON)+ IDENTIFIER
     ;
 
 typeAnnotation: TYPE_STRING | TYPE_INT | TYPE_FLOAT | TYPE_BOOL | TYPE_MATRIX;

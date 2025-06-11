@@ -107,6 +107,15 @@ class EnglishLangParserListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by EnglishLangParser#scopedIdentifier.
+    def enterScopedIdentifier(self, ctx:EnglishLangParser.ScopedIdentifierContext):
+        pass
+
+    # Exit a parse tree produced by EnglishLangParser#scopedIdentifier.
+    def exitScopedIdentifier(self, ctx:EnglishLangParser.ScopedIdentifierContext):
+        pass
+
+
     # Enter a parse tree produced by EnglishLangParser#typeAnnotation.
     def enterTypeAnnotation(self, ctx:EnglishLangParser.TypeAnnotationContext):
         pass

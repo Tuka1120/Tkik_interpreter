@@ -24,6 +24,8 @@ WHILE : 'While';
 END_WHILE : 'End While';
 INVERT_MATRIX : 'invert';
 TRANSPOSITION : '\'T';
+PARENT_SCOPE: 'parent';
+DCOLON: '::';
 
 
 // Operators

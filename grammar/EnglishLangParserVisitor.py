@@ -64,6 +64,11 @@ class EnglishLangParserVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by EnglishLangParser#scopedIdentifier.
+    def visitScopedIdentifier(self, ctx:EnglishLangParser.ScopedIdentifierContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by EnglishLangParser#typeAnnotation.
     def visitTypeAnnotation(self, ctx:EnglishLangParser.TypeAnnotationContext):
         return self.visitChildren(ctx)

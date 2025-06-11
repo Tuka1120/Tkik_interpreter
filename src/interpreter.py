@@ -11,35 +11,48 @@ class FunctionReturn(Exception):
     def __init__(self, value):
         self.value = value
 
+class Scope:
+    def __init__(self, parent=None):
+        self.variables = {}
+        self.parent = parent
+
+    def set_variable(self, name, value):
+        self.variables[name] = value
+
+    def get_variable(self, name):
+        if name in self.variables:
+            return self.variables[name]
+        elif self.parent:
+            return self.parent.get_variable(name)
+        else:
+            raise Exception(f"Variable '{name}' not found in any scope")
+
 class Interpreter(EnglishLangParserVisitor):
     def __init__(self):
         super().__init__()
-        self.global_env = {}
-        self.env_stack = [self.global_env]
+        self.global_scope = Scope()
+        self.current_scope = self.global_scope
         self.memory = {}
         self.variables = {}
         self.functions = {}        
         self.output_lines = []
         self.call_stack = []
 
-    def current_env(self):
-        return self.env_stack[-1]
-
     def push_env(self):
-        self.env_stack.append({})
+        self.current_scope = Scope(parent=self.current_scope)
 
     def pop_env(self):
-        self.env_stack.pop()
+        if self.current_scope.parent:
+            self.current_scope = self.current_scope.parent
+        else:
+            raise Exception("Cannot pop global scope")
 
     def set_var(self, name, value):
-        env = self.current_env()
-        env[name] = value
+        self.current_scope.set_variable(name, value)
 
     def get_var(self, name):
-        for env in reversed(self.env_stack):
-            if name in env:
-                return env[name]
-        raise Exception(f"Variable '{name}' is not defined")
+        return self.current_scope.get_variable(name)
+
 
     def visitProgram(self, ctx):
         for stmt in ctx.statement():
@@ -98,10 +111,7 @@ class Interpreter(EnglishLangParserVisitor):
         return None
     
     def lookup_variable(self, name):
-        for scope in reversed(self.env_stack): 
-            if name in scope:
-                return scope[name]
-        raise Exception(f"Variable '{name}' not found in any scope")
+        return self.current_scope.get_variable(name)
 
     def visitFunctionDeclaration(self, ctx):
         name = ctx.IDENTIFIER().getText()
@@ -142,9 +152,11 @@ class Interpreter(EnglishLangParserVisitor):
         if len(param_names) != len(args):
             raise Exception(f"Function '{name}' expects {len(param_names)} args, got {len(args)}")
 
-        local_scope = dict(zip(param_names, args))
-        self.env_stack.append(local_scope)
-        self.call_stack.append(name)
+        local_scope = Scope(parent=self.current_scope)
+        for pname, arg in zip(param_names, args):
+            local_scope.set_variable(pname, arg)
+
+        self.current_scope = local_scope
 
         try:
             self.visit(body)
@@ -153,8 +165,7 @@ class Interpreter(EnglishLangParserVisitor):
         else:
             return_value = None
         finally:
-            self.call_stack.pop()
-            self.env_stack.pop()
+            self.current_scope = self.current_scope.parent
 
         print(f"Function {name} returned: {return_value}")
         return return_value
@@ -165,6 +176,20 @@ class Interpreter(EnglishLangParserVisitor):
             return self.variables[var_name]
         else:
             raise Exception(f"Undefined variable: {var_name}")
+        
+    def visitScopedIdentifier(self, ctx):
+        levels = len(ctx.getTokens(EnglishLangParser.PARENT_SCOPE))
+        name = ctx.IDENTIFIER().getText()
+        current_scope = self.current_scope
+        for _ in range(levels):
+            if current_scope.parent is None:
+                raise Exception(f"No parent scope exists while resolving 'parent::{name}'")
+            current_scope = current_scope.parent
+
+        value = current_scope.get_variable(name)
+        if value is None:
+            raise Exception(f"Variable '{name}' not found in the specified parent scope")
+        return value
     
     def visitReturnStatement(self, ctx):
         value = self.visit(ctx.expression())
@@ -445,6 +470,12 @@ class Interpreter(EnglishLangParserVisitor):
             return self.visit(ctx.numExpression())
         elif ctx.boolExpression():
             return self.visit(ctx.boolExpression())
+        elif ctx.matrixExpression():
+            return self.visit(ctx.matrixExpression())
+        elif ctx.stringExpression():
+            return self.visit(ctx.stringExpression())
+        elif ctx.scopedIdentifier():
+            return self.visit(ctx.scopedIdentifier())
         elif ctx.STRING():
             return ctx.STRING().getText().strip('"')
         elif ctx.IDENTIFIER():
