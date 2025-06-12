@@ -288,6 +288,9 @@ class Interpreter(EnglishLangParserVisitor):
 
     def visitFactorOperation(self, ctx):
         return self.visit(ctx.operation())
+    
+    def visitFactorscopedIdentifier(self, ctx):
+        return self.visit(ctx.scopedIdentifier())
 
     def visitOperation(self, ctx):
         var_name = ctx.IDENTIFIER().getText()
@@ -423,12 +426,16 @@ class Interpreter(EnglishLangParserVisitor):
 
 
     def visitWhileLoop(self, ctx):
-        while self.visit(ctx.boolExpression()):
-            if ctx.LBRACE():
-                for stmt in ctx.loopStatements():
-                    self.visit(stmt)
-            else:
-                self.visit(ctx.statement())
+        self.push_env()
+        try:
+            while self.visit(ctx.boolExpression()):
+                if ctx.LBRACE():
+                    for stmt in ctx.loopStatements():
+                        self.visit(stmt)
+                else:
+                    self.visit(ctx.statement())
+        finally:
+            self.pop_env()
 
     def visitForLoop(self, ctx):
         if ctx.forInit():
@@ -444,12 +451,14 @@ class Interpreter(EnglishLangParserVisitor):
             body_statements = ctx.forBody().loopStatements()
         else:
             body_statements = [ctx.forBody().statement()]
-
-        while condition():
-            for stmt in body_statements:
-                self.visit(stmt)
-            update()
-
+        self.push_env()
+        try:
+            while condition():
+                for stmt in body_statements:
+                    self.visit(stmt)
+                update()
+        finally:
+            self.pop_env()
 
     def evaluateBinaryOp(self, left, right, op):
         if op == '+': return left + right

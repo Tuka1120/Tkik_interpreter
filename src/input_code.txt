@@ -1,14 +1,12 @@
 Start Program
 
     Set x to 10 int
-
-    Define Function addNumbers (num1 int, num2 int){
-        Set x to 4 int
-        Set y to x
-        Set o to parent::x
-        Display y, o
-    }End Function
-
-    Call addNumbers (5, 3)
+    Set i to 0
+    While (i <= 3)
+    {
+        Set x to 5 int
+        Display x, parent::x + x
+        Set i to i + 1
+    }
 
 End Program

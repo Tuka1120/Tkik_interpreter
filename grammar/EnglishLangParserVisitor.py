@@ -189,6 +189,11 @@ class EnglishLangParserVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by EnglishLangParser#factorscopedIdentifier.
+    def visitFactorscopedIdentifier(self, ctx:EnglishLangParser.FactorscopedIdentifierContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by EnglishLangParser#factorIdentifier.
     def visitFactorIdentifier(self, ctx:EnglishLangParser.FactorIdentifierContext):
         return self.visitChildren(ctx)

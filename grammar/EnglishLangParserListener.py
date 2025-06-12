@@ -332,6 +332,15 @@ class EnglishLangParserListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by EnglishLangParser#factorscopedIdentifier.
+    def enterFactorscopedIdentifier(self, ctx:EnglishLangParser.FactorscopedIdentifierContext):
+        pass
+
+    # Exit a parse tree produced by EnglishLangParser#factorscopedIdentifier.
+    def exitFactorscopedIdentifier(self, ctx:EnglishLangParser.FactorscopedIdentifierContext):
+        pass
+
+
     # Enter a parse tree produced by EnglishLangParser#factorIdentifier.
     def enterFactorIdentifier(self, ctx:EnglishLangParser.FactorIdentifierContext):
         pass

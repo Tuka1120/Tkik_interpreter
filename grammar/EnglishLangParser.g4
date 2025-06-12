@@ -58,6 +58,7 @@ expression:
     | scopedIdentifier
     | NUMBER
     | STRING
+    | scopedIdentifier
     | IDENTIFIER
     | '(' expression ')'
     ;
@@ -159,6 +160,7 @@ factor
     | MINUS factor                             #unaryMinus
     | functionCall                             #factorFunctionCall
     | NUMBER                                   #factorNumber
+    | scopedIdentifier                         #factorscopedIdentifier
     | IDENTIFIER                               #factorIdentifier
     | STRING                                   #factorString
     | operation                                #factorOperation
