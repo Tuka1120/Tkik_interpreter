@@ -48,13 +48,6 @@ class Interpreter(EnglishLangParserVisitor):
             raise Exception("Cannot pop global scope")
 
     def set_var(self, name, value):
-        scope = self.current_scope
-        while scope:
-            if name in scope.variables:
-                scope.variables[name] = value
-                return
-            scope = scope.parent
-        # If not found in parent scopes, set it in current scope
         self.current_scope.set_variable(name, value)
 
     def get_var(self, name):
