@@ -1,11 +1,17 @@
 Start Program
-    Set x to 20
+
+    Set i to 0 
     Set x to 10 int
-    Set i to 0
-    While (i <= 3)
+
+    For (Set j to 5 int; j > 0; Set j to j - 1 int)
     {
-        Set x to 5 int
-        Display x, parent::x
-        Set i to i + 1
+        For (Set k to 3 int; k > 0; Set k to k - 1 int)
+        {
+            Set x to 5 int
+            Display x, parent::parent::x 
+        }
+
+        Set i to i + 1 int
     }
+
 End Program

@@ -26,7 +26,7 @@ def main():
     parser = EnglishLangParser(token_stream)
 
     parser.removeErrorListeners()
-    parser.addErrorListener(EnglishLangErrorListener())
+    parser.addErrorListener(EnglishLangErrorListener(code))
 
     try:
         tree = parser.program()
