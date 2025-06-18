@@ -1,14 +1,110 @@
 Start Program
 
-{
-    Set a to 2 int
+    Set x to 4 int
+    Set y to 5 int
+    Display (y + x * 5) * 2
+    Display x + y, "Sum: ", (x + y) * 2
+
+
+    Set greeting to "Hello" string
+    Set name to "Alice" string
+    Display greeting + " " + name
+
+    Set a to 5 int
+    Set b to 10 int
+    Set c to 6 int
+    Set isLess to a < b bool
+    Set isMore to a > b bool
+    Set result to isLess and not isMore bool
+    Display result
+
+    If (a < b and a < c)
+        Display "a is less than b and c"
+    Else If (a == b)
+        Display "a is equal to b"
+    Else
+        Display "a is greater than b"
+
+
+    Set i to 0
+    While (i <= 3)
     {
-        Set a to 5 int
-
-        Set x to a // x has the value 5
-
-        Display parent::a
+        Display i
+        Set i to i + 1
     }
-}
+
+    Set i to 0
+    For (Set j to 10; j > 0; Set j to j - 1)
+    {
+        If (j / 2 == 0)
+            Display "Even:", j
+        Else
+            Display "Odd:", j
+
+        Set i to i + 1
+    }
+
+
+    Define Function addNumbers (num1 int, num2 int){
+        Set result to num1 + num2 int
+        Display result
+    }End Function
+
+    Call addNumbers (5, 3)
+
+    Define Function printMessage (message string){ 
+        Display message
+    }End Function
+
+    Call printMessage ("Hello, World!")
+
+
+    Define Function factorial (n int) {
+        If (n == 0) {
+            Return 1
+        }
+        Return n * factorial(n - 1)
+    } End Function
+
+    factorial(5)
+
+
+    Define Function countdown (n int) {
+        For (i to n; i >= 1; i to i - 1) 
+        {
+            Display i
+        }
+    } End Function
+
+    countdown(10)
+
+    Define Function countup (n int) {
+        For (i to 0; i <= n; i to i + 1) 
+        {
+            Display i
+        }
+    } End Function
+
+    countup(10)
     
+    Define Function up (n int) {
+        Set i to 0
+        While (i <= n){
+            Display i
+            i to i + 1
+        }
+    } End Function
+
+    up(5)
+
+    Define Function down (n int) {
+        While (0 < n){
+            Display n
+            n to n - 1
+        }
+    } End Function
+
+    down(5)
+    
+
 End Program

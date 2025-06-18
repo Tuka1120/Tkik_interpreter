@@ -154,10 +154,12 @@ class Interpreter(EnglishLangParserVisitor):
         if len(param_names) != len(args):
             raise Exception(f"Function '{name}' expects {len(param_names)} args, got {len(args)}")
 
-        local_scope = Scope(parent=self.current_scope)
+        local_scope = Scope(parent=self.global_scope)
+
         for pname, arg in zip(param_names, args):
             local_scope.set_variable(pname, arg)
 
+        previous_scope = self.current_scope
         self.current_scope = local_scope
 
         try:
@@ -167,7 +169,7 @@ class Interpreter(EnglishLangParserVisitor):
         else:
             return_value = None
         finally:
-            self.current_scope = self.current_scope.parent
+            self.current_scope = previous_scope
 
         print(f"Function {name} returned: {return_value}")
         return return_value
