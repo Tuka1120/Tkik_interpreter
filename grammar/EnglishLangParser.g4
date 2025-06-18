@@ -17,6 +17,7 @@ statement:
     | loopStatement
     | forLoop
     | whileLoop
+    | blockStatement
     | operation
     ;
 
@@ -27,7 +28,7 @@ loopStatements:
     | functionDeclaration
     | returnStatement
     | loopIfStatement
-    | block
+    | blockStatement
     | BREAK
     | displayStatement
     ;
@@ -55,7 +56,6 @@ expression:
     | boolExpression
     | matrixExpression
     | stringExpression
-    | scopedIdentifier
     | NUMBER
     | STRING
     | scopedIdentifier
@@ -72,7 +72,7 @@ typeAnnotation: TYPE_STRING | TYPE_INT | TYPE_FLOAT | TYPE_BOOL | TYPE_MATRIX;
 
 // Function Declaration
 functionDeclaration
-    : DEFINE_FUNCTION IDENTIFIER LPAREN parameter? RPAREN block END_FUNCTION
+    : DEFINE_FUNCTION IDENTIFIER LPAREN parameter? RPAREN blockStatement END_FUNCTION
     ;
 
 // Parameters and Arguments
@@ -105,9 +105,9 @@ builtInFunctions:POWER_FUNC LPAREN numExpression COMMA numExpression RPAREN
               LPAREN numExpression RPAREN;
 
 
-ifStatement: IF LPAREN boolExpression RPAREN (statement | block)
-             (ELSE_IF LPAREN boolExpression RPAREN (statement | block))*
-             (ELSE (statement | block))?;
+ifStatement: IF LPAREN boolExpression RPAREN (statement | blockStatement)
+             (ELSE_IF LPAREN boolExpression RPAREN (statement | blockStatement))*
+             (ELSE (statement | blockStatement))?;
 loopIfStatement: IF LPAREN boolExpression RPAREN (LBRACE loopStatements+ RBRACE | statement)
 
              (ELSE_IF LPAREN boolExpression RPAREN (LBRACE loopStatements+ RBRACE | statement))*
@@ -145,8 +145,7 @@ whileLoop:
 // Display
 displayStatement: DISPLAY expression (',' expression)*;
 
-// Blocks
-block: LBRACE statement+ RBRACE ;
+blockStatement: LBRACE statement* RBRACE ;
 
 // Expressions
 numExpression : numExpression (PLUS|MINUS) term 

@@ -124,7 +124,7 @@ class Interpreter(EnglishLangParserVisitor):
                 param_name = typed_param.IDENTIFIER().getText()
                 param_list.append(param_name)
 
-        body = ctx.block()
+        body = ctx.blockStatement()
         self.functions[name] = {
             "params": param_list,
             "body": body
@@ -222,15 +222,16 @@ class Interpreter(EnglishLangParserVisitor):
             raise Exception(f"Variable '{name}' not found in the specified parent scope")
         return value
     
-    def visitReturnStatement(self, ctx):
-        value = self.visit(ctx.expression())
-        raise FunctionReturn(value)
-
-    def visitBlock(self, ctx):
+    def visitBlockStatement(self, ctx):
         self.push_env()
         for stmt in ctx.statement():
             self.visit(stmt)
         self.pop_env()
+
+    
+    def visitReturnStatement(self, ctx):
+        value = self.visit(ctx.expression())
+        raise FunctionReturn(value)
 
     def visitStatement(self, ctx):
         result = self.visitChildren(ctx)
@@ -453,23 +454,24 @@ class Interpreter(EnglishLangParserVisitor):
 
     def visitIfStatement(self, ctx):
         if self.visit(ctx.boolExpression(0)):
-            stmt_or_block = ctx.statement(0) or ctx.block(0)
+            stmt_or_block = ctx.statement(0) or ctx.blockStatement(0)
             if stmt_or_block:
                 return self.visit(stmt_or_block)
 
         for i in range(len(ctx.ELSE_IF())):
             if self.visit(ctx.boolExpression(i + 1)):
-                stmt_or_block = ctx.statement(i + 1) or ctx.block(i + 1)
+                stmt_or_block = ctx.statement(i + 1) or ctx.blockStatement(i + 1)
                 if stmt_or_block:
                     return self.visit(stmt_or_block)
 
         if ctx.ELSE():
             num_ifs = 1 + len(ctx.ELSE_IF())
-            stmt_or_block = ctx.statement(num_ifs) or ctx.block(num_ifs)
+            stmt_or_block = ctx.statement(num_ifs) or ctx.blockStatement(num_ifs)
             if stmt_or_block:
                 return self.visit(stmt_or_block)
 
         return None
+
 
     def visitLoopIfStatement(self, ctx):
         if self.visit(ctx.boolExpression(0)):
@@ -510,8 +512,8 @@ class Interpreter(EnglishLangParserVisitor):
             return self.visit(ctx.returnStatement())
         elif ctx.loopIfStatement():
             return self.visit(ctx.loopIfStatement())
-        elif ctx.block():
-            return self.visit(ctx.block())
+        elif ctx.blockStatement():
+            return self.visit(ctx.blockStatement())
         elif ctx.displayStatement():
             return self.visit(ctx.displayStatement())
 

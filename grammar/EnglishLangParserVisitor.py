@@ -154,8 +154,8 @@ class EnglishLangParserVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by EnglishLangParser#block.
-    def visitBlock(self, ctx:EnglishLangParser.BlockContext):
+    # Visit a parse tree produced by EnglishLangParser#blockStatement.
+    def visitBlockStatement(self, ctx:EnglishLangParser.BlockStatementContext):
         return self.visitChildren(ctx)
 
 

@@ -269,12 +269,12 @@ class EnglishLangParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by EnglishLangParser#block.
-    def enterBlock(self, ctx:EnglishLangParser.BlockContext):
+    # Enter a parse tree produced by EnglishLangParser#blockStatement.
+    def enterBlockStatement(self, ctx:EnglishLangParser.BlockStatementContext):
         pass
 
-    # Exit a parse tree produced by EnglishLangParser#block.
-    def exitBlock(self, ctx:EnglishLangParser.BlockContext):
+    # Exit a parse tree produced by EnglishLangParser#blockStatement.
+    def exitBlockStatement(self, ctx:EnglishLangParser.BlockStatementContext):
         pass
 
 
