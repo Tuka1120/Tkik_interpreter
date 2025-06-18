@@ -3,6 +3,8 @@ from antlr4 import *
 from EnglishLangLexer import EnglishLangLexer
 from EnglishLangParser import EnglishLangParser
 from EnglishLangParserVisitor import EnglishLangParserVisitor
+import math
+
 
 class BreakStatement:
     pass
@@ -169,6 +171,35 @@ class Interpreter(EnglishLangParserVisitor):
 
         print(f"Function {name} returned: {return_value}")
         return return_value
+    
+    def visitBuiltInFunctions(self, ctx):
+        if ctx.POWER_FUNC():
+            base = self.visit(ctx.numExpression(0))
+            exponent = self.visit(ctx.numExpression(1))
+            return math.pow(base, exponent)
+
+        elif ctx.SIN_FUNC():
+            value = self.visit(ctx.numExpression(0))
+            return math.sin(value)
+
+        elif ctx.COS_FUNC():
+            value = self.visit(ctx.numExpression(0))
+            return math.cos(value)
+
+        elif ctx.TAN_FUNC():
+            value = self.visit(ctx.numExpression(0))
+            return math.tan(value)
+
+        elif ctx.CTAN_FUNC():
+            value = self.visit(ctx.numExpression(0))
+            tan_val = math.tan(value)
+            if tan_val == 0:
+                raise ZeroDivisionError("Cotangent undefined: tan(value) = 0")
+            return 1 / tan_val
+
+        else:
+            raise Exception("Unknown built-in function")
+
 
     def visitIdentifier(self, ctx):
         var_name = ctx.getText()
@@ -326,6 +357,61 @@ class Interpreter(EnglishLangParserVisitor):
         op = ctx.getChild(1).getText()
         return (left == right) if op == "==" else (left != right)
 
+    def transpose_matrix(self, matrix):
+        if not matrix or not matrix[0]:
+            return []
+        return [[matrix[j][i] for j in range(len(matrix))] for i in range(len(matrix[0]))]
+
+    def invert_matrix(self, matrix):
+        if len(matrix) != 2 or len(matrix[0]) != 2:
+            raise Exception("Only 2x2 matrix inversion supported")
+
+        a, b = matrix[0]
+        c, d = matrix[1]
+        determinant = a * d - b * c
+
+        if determinant == 0:
+            raise Exception("Matrix is not invertible")
+
+        inverse = [
+            [d / determinant, -b / determinant],
+            [-c / determinant, a / determinant]
+        ]
+        return inverse
+
+    def visitMatrixExpression(self, ctx):
+        matrix = self.visit(ctx.matrixAtom())
+
+        if ctx.INVERT_MATRIX():
+            return self.invert_matrix(matrix)
+
+        if ctx.TRANSPOSITION():
+            return self.transpose_matrix(matrix)
+
+        return matrix
+
+    def visitMatrixAtom(self, ctx):
+        if ctx.IDENTIFIER():
+            return self.lookup_variable(ctx.IDENTIFIER().getText())
+        else:
+            return self.visit(ctx.matrixConstruction())
+
+    def visitValue(self, ctx):
+        if ctx.NUMBER():
+            return float(ctx.NUMBER().getText())
+        elif ctx.IDENTIFIER():
+            return self.lookup_variable(ctx.IDENTIFIER().getText())
+        elif ctx.matrixExpression():
+            return self.visit(ctx.matrixExpression())
+
+
+    def visitMatrixConstruction(self, ctx):
+        rows = []
+        for rowCtx in ctx.row():
+            row = [self.visit(value) for value in rowCtx.value()]
+            rows.append(row)
+        return rows
+
     def visitBoolExpression(self, ctx):
         return self.visitChildren(ctx)
 
@@ -479,6 +565,10 @@ class Interpreter(EnglishLangParserVisitor):
             return self.visit(ctx.numExpression())
         elif ctx.boolExpression():
             return self.visit(ctx.boolExpression())
+        elif ctx.functionCall():
+            return self.visit(ctx.functionCall())
+        elif ctx.builtInFunctions():
+            return self.visit(ctx.builtInFunctions())
         elif ctx.matrixExpression():
             return self.visit(ctx.matrixExpression())
         elif ctx.stringExpression():

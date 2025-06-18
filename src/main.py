@@ -22,11 +22,14 @@ def main():
     input_stream = InputStream(code)
 
     lexer = EnglishLangLexer(input_stream)
-    token_stream = CommonTokenStream(lexer)
-    parser = EnglishLangParser(token_stream)
+    lexer.removeErrorListeners()
+    lexer.addErrorListener(EnglishLangErrorListener(code))  
 
+    token_stream = CommonTokenStream(lexer)
+
+    parser = EnglishLangParser(token_stream)
     parser.removeErrorListeners()
-    parser.addErrorListener(EnglishLangErrorListener(code))
+    parser.addErrorListener(EnglishLangErrorListener(code))  
 
     try:
         tree = parser.program()

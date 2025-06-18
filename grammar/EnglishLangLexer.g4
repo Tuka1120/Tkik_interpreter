@@ -7,7 +7,6 @@ DEFINE_FUNCTION : 'Define Function';
 END_FUNCTION : 'End Function';
 RETURN : 'Return';
 CALL : 'Call';
-WITH : 'with';
 SET : 'Set';
 TO : 'to';
 DISPLAY : 'Display';
