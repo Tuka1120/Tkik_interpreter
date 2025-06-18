@@ -41,9 +41,9 @@ variableDeclaration
 matrixExpression: (INVERT_MATRIX)? matrixAtom (TRANSPOSITION)?;
 matrixAtom: IDENTIFIER | matrixConstruction;
 
-matrixConstruction: LBRACE row (SEMICOLON row)* RBRACE;
+matrixConstruction: LBRACK row (SEMICOLON row)* RBRACK;
 row: value (COMMA value)*;
-value: NUMBER | IDENTIFIER | matrixExpression;
+value: NUMBER | IDENTIFIER;
 
 stringExpression: (STRING | IDENTIFIER) ( PLUS (STRING | IDENTIFIER))*;
 

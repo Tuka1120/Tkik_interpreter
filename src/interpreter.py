@@ -396,21 +396,26 @@ class Interpreter(EnglishLangParserVisitor):
         else:
             return self.visit(ctx.matrixConstruction())
 
-    def visitValue(self, ctx):
-        if ctx.NUMBER():
-            return float(ctx.NUMBER().getText())
-        elif ctx.IDENTIFIER():
-            return self.lookup_variable(ctx.IDENTIFIER().getText())
-        elif ctx.matrixExpression():
-            return self.visit(ctx.matrixExpression())
-
-
     def visitMatrixConstruction(self, ctx):
         rows = []
         for rowCtx in ctx.row():
             row = [self.visit(value) for value in rowCtx.value()]
             rows.append(row)
+            print("DEBUG row:", row)
         return rows
+
+    def visitValue(self, ctx):
+        if ctx.NUMBER():
+            return float(ctx.NUMBER().getText())
+        elif ctx.IDENTIFIER():
+            value = self.lookup_variable(ctx.IDENTIFIER().getText())
+            if isinstance(value, list) and any(isinstance(row, list) for row in value):
+                raise Exception("Matrix cannot contain another matrix as an element")
+            return value
+        elif ctx.matrixExpression():
+            raise Exception("Matrix cannot contain another matrix as an element")
+        else:
+            raise Exception("Invalid matrix value: must be a number or scalar variable")
 
     def visitBoolExpression(self, ctx):
         return self.visitChildren(ctx)
