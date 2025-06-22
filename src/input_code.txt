@@ -1,26 +1,40 @@
 Start Program
-
-    Set x to 999 int
-
-    Define Function inner(n int) {
-        Set x to 42 int
-        Display n * x
-        Display x             // 42
-        Display parent::x     // 999
-        Return parent::x
-
-    }
-    End Function
-
-    Define Function outer() {
-        Set x to 123 int
-        Display inner(6)
-        Display x             // 123
-        Display parent::x     // 999
-    }
-    End Function
-
-    outer()
-
+    Set globalVar to "Global Value" string
     
+    Define Function outerFunction() {
+        Set outerVar to "Outer Value" string
+        
+        Define Function middleFunction() {
+            Set middleVar to "Middle Value" string
+            
+            Define Function innerFunction() {
+                Set innerVar to "Inner Value" string
+                
+                // Access variables from different scopes
+                Display "Inner Scope:"
+                Display "  Local:", innerVar
+                Display "  Parent:", parent::middleVar
+                Display "  Grandparent:", parent::parent::outerVar
+                Display "  Global:", parent::parent::parent::globalVar
+            } End Function
+            
+            Display "\nMiddle Scope:"
+            Display "  Local:", middleVar
+            Display "  Parent:", parent::outerVar
+            Display "  Global:", parent::parent::globalVar
+            
+            Call innerFunction()
+        } End Function
+        
+        Display "\nOuter Scope:"
+        Display "  Local:", outerVar
+        Display "  Global:", parent::globalVar
+        
+        Call middleFunction()
+    } End Function
+    
+    Display "Global Scope:"
+    Display "  Global:", globalVar
+    
+    Call outerFunction()
 End Program

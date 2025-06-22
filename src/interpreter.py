@@ -124,7 +124,8 @@ class Interpreter(EnglishLangParserVisitor):
         body = ctx.blockStatement()
         self.functions[name] = {
             "params": param_list,
-            "body": body
+            "body": body,
+            "scope": self.current_scope
         }
         return None
 
@@ -147,11 +148,12 @@ class Interpreter(EnglishLangParserVisitor):
         func = self.functions[name]
         param_names = func["params"]
         body = func["body"]
+        defining_scope = func["scope"]
 
         if len(param_names) != len(args):
             raise Exception(f"Function '{name}' expects {len(param_names)} args, got {len(args)}")
 
-        local_scope = Scope(parent=self.global_scope)
+        local_scope = Scope(parent=defining_scope)
 
         for pname, arg in zip(param_names, args):
             local_scope.set_variable(pname, arg)
