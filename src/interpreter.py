@@ -75,39 +75,21 @@ class Interpreter(EnglishLangParserVisitor):
     def visitVariableDeclaration(self, ctx):
         name = ctx.IDENTIFIER().getText()
         value = self.visit(ctx.expression())
-
         type_ctx = ctx.typeAnnotation()
         declared_type = type_ctx.getText().lower() if type_ctx else None
 
         if declared_type:
-            # ❗ Only allow declaring new variable in current scope
+            value = self.cast_value(value, declared_type)
+
             if self.current_scope.has_variable(name):
                 raise Exception(f"Variable '{name}' already declared in this scope.")
 
-            # Cast value based on declared type
-            if declared_type == 'int':
-                value = int(value)
-            elif declared_type == 'float':
-                value = float(value)
-            elif declared_type == 'bool':
-                value = value.lower() == 'true' if isinstance(value, str) else bool(value)
-            elif declared_type == 'string':
-                value = str(value)
-            elif declared_type == 'matrix':
-                if not isinstance(value, list):
-                    raise Exception(f"Expected matrix value for '{name}'")
-            else:
-                raise Exception(f"Unknown type: {declared_type}")
-
-            # Declare in current scope
             self.current_scope.set_variable(name, value)
-
         else:
-            # ❗ No type = it's a reassignment — update closest defined var
+            # No type = assignment; assign to existing variable or current scope
             self.set_var(name, value)
 
         return None
-
     
     def lookup_variable(self, name):
         return self.current_scope.get_variable(name)
@@ -418,6 +400,31 @@ class Interpreter(EnglishLangParserVisitor):
             raise Exception("Matrix cannot contain another matrix as an element")
         else:
             raise Exception("Invalid matrix value: must be a number or scalar variable")
+
+    def visitCastExpression(self, ctx):
+        type_str = ctx.typeAnnotation().getText().lower()
+        value = self.visit(ctx.factor())
+        return self.cast_value(value, type_str)
+
+    def cast_value(self, value, type_str):
+        if type_str == "int":
+            return int(float(value))  # float → int works
+        elif type_str == "float":
+            return float(value)
+        elif type_str == "bool":
+            if isinstance(value, str):
+                return value.lower() == "true"
+            return bool(value)
+        elif type_str == "string":
+            return str(value)
+        elif type_str == "matrix":
+            # Assume matrix casting is only allowed on proper nested lists
+            if isinstance(value, list) and all(isinstance(row, list) for row in value):
+                return value
+            raise Exception("Invalid matrix format")
+        else:
+            raise Exception(f"Unknown type: {type_str}")
+
 
     def visitBoolExpression(self, ctx):
         return self.visitChildren(ctx)

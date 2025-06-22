@@ -377,6 +377,15 @@ class EnglishLangParserListener(ParseTreeListener):
         pass
 
 
+    # Enter a parse tree produced by EnglishLangParser#castExpression.
+    def enterCastExpression(self, ctx:EnglishLangParser.CastExpressionContext):
+        pass
+
+    # Exit a parse tree produced by EnglishLangParser#castExpression.
+    def exitCastExpression(self, ctx:EnglishLangParser.CastExpressionContext):
+        pass
+
+
     # Enter a parse tree produced by EnglishLangParser#operation.
     def enterOperation(self, ctx:EnglishLangParser.OperationContext):
         pass

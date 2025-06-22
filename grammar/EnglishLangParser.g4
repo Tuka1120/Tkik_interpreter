@@ -164,6 +164,7 @@ factor
     | STRING                                   #factorString
     | operation                                #factorOperation
     | LPAREN numExpression RPAREN              #factorParens
+    | LPAREN typeAnnotation RPAREN factor        #castExpression
     ;
 
 operation : IDENTIFIER (INCREMENT | DECREMENT) SEMICOLON? ;

@@ -214,6 +214,11 @@ class EnglishLangParserVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
+    # Visit a parse tree produced by EnglishLangParser#castExpression.
+    def visitCastExpression(self, ctx:EnglishLangParser.CastExpressionContext):
+        return self.visitChildren(ctx)
+
+
     # Visit a parse tree produced by EnglishLangParser#operation.
     def visitOperation(self, ctx:EnglishLangParser.OperationContext):
         return self.visitChildren(ctx)
