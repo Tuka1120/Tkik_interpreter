@@ -21,6 +21,9 @@ class Scope:
     def set_variable(self, name, value):
         self.variables[name] = value
 
+    def has_variable(self, name):
+        return name in self.variables
+
     def get_variable(self, name):
         if name in self.variables:
             return self.variables[name]
@@ -50,11 +53,17 @@ class Interpreter(EnglishLangParserVisitor):
             raise Exception("Cannot pop global scope")
 
     def set_var(self, name, value):
+        scope = self.current_scope
+        while scope:
+            if scope.has_variable(name):  # ✅ use has_variable here
+                scope.set_variable(name, value)
+                return
+            scope = scope.parent
+        # If not found, define in current scope
         self.current_scope.set_variable(name, value)
 
     def get_var(self, name):
         return self.current_scope.get_variable(name)
-
 
     def visitProgram(self, ctx):
         for stmt in ctx.statement():
@@ -62,22 +71,6 @@ class Interpreter(EnglishLangParserVisitor):
             if result is not None and not isinstance(result, BreakStatement):
                 self.output_lines.append(str(result))
         return self.output_lines
-    
-    def visitAssignment(self, ctx):
-        var_name = ctx.IDENTIFIER().getText()
-        value = self.visit(ctx.expression())
-        var_type = self.visit(ctx.typeIdentifier()) if ctx.typeIdentifier() else None
-
-        if var_name not in self.memory:
-            if var_type:
-                self.memory[var_name] = self.cast_value(value, var_type)
-            else:
-                self.memory[var_name] = value
-        else:
-            self.memory[var_name] = value
-
-        return self.memory[var_name]
-
 
     def visitVariableDeclaration(self, ctx):
         name = ctx.IDENTIFIER().getText()
@@ -86,31 +79,35 @@ class Interpreter(EnglishLangParserVisitor):
         type_ctx = ctx.typeAnnotation()
         declared_type = type_ctx.getText().lower() if type_ctx else None
 
-        if declared_type == 'int':
-            value = int(value) if isinstance(value, (int, float, str)) else 0
-        elif declared_type == 'float':
-            value = float(value) if isinstance(value, (int, float, str)) else 0.0
-        elif declared_type == 'bool':
-            if isinstance(value, str):
-                value = value.lower() == 'true'
-            else:
-                value = bool(value)
-        elif declared_type == 'string':
-            value = str(value)
-        elif declared_type == 'matrix':
-            if not isinstance(value, list) or not all(isinstance(row, list) for row in value):
-                raise Exception(f"Invalid matrix assignment to variable '{name}'")
-        elif declared_type is None:
-            if isinstance(value, str):
-                try:
-                    value = float(value) if '.' in value else int(value)
-                except:
-                    pass  
-        else:
-            raise Exception(f"Unknown type '{declared_type}' for variable '{name}'")
+        if declared_type:
+            # ❗ Only allow declaring new variable in current scope
+            if self.current_scope.has_variable(name):
+                raise Exception(f"Variable '{name}' already declared in this scope.")
 
-        self.set_var(name, value)
+            # Cast value based on declared type
+            if declared_type == 'int':
+                value = int(value)
+            elif declared_type == 'float':
+                value = float(value)
+            elif declared_type == 'bool':
+                value = value.lower() == 'true' if isinstance(value, str) else bool(value)
+            elif declared_type == 'string':
+                value = str(value)
+            elif declared_type == 'matrix':
+                if not isinstance(value, list):
+                    raise Exception(f"Expected matrix value for '{name}'")
+            else:
+                raise Exception(f"Unknown type: {declared_type}")
+
+            # Declare in current scope
+            self.current_scope.set_variable(name, value)
+
+        else:
+            # ❗ No type = it's a reassignment — update closest defined var
+            self.set_var(name, value)
+
         return None
+
     
     def lookup_variable(self, name):
         return self.current_scope.get_variable(name)
@@ -521,39 +518,38 @@ class Interpreter(EnglishLangParserVisitor):
 
 
     def visitWhileLoop(self, ctx):
-        self.push_env()
-        try:
-            while self.visit(ctx.boolExpression()):
-                if ctx.LBRACE():
-                    for stmt in ctx.loopStatements():
-                        self.visit(stmt)
-                else:
-                    self.visit(ctx.statement())
-        finally:
-            self.pop_env()
+        while self.visit(ctx.boolExpression()):
+            self.push_env()  
 
+            for stmt in ctx.loopStatements():
+                result = self.visit(stmt)
+                if isinstance(result, BreakStatement):
+                    self.pop_env()
+                    return
+                if result is not None:
+                    self.pop_env()
+                    return result
+
+            self.pop_env()  
+        return None
+
+            
     def visitForLoop(self, ctx):
         if ctx.forInit():
             self.visit(ctx.forInit())
 
-        def condition():
-            return self.visit(ctx.cond)
+        while self.visit(ctx.cond): 
+            self.push_env()  
 
-        def update():
+            result = self.visit(ctx.forBody())
+            if isinstance(result, BreakStatement):
+                self.pop_env()
+                return
+
+            self.pop_env()
+
             self.visit(ctx.forUpdate())
 
-        if ctx.forBody().LBRACE():
-            body_statements = ctx.forBody().loopStatements()
-        else:
-            body_statements = [ctx.forBody().statement()]
-        self.push_env()
-        try:
-            while condition():
-                for stmt in body_statements:
-                    self.visit(stmt)
-                update()
-        finally:
-            self.pop_env()
 
     def evaluateBinaryOp(self, left, right, op):
         if op == '+': return left + right
