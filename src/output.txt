@@ -1,14 +1,1 @@
-Global Scope:
-  Global: Global Value
-\nOuter Scope:
-  Local: Outer Value
-  Global: Global Value
-\nMiddle Scope:
-  Local: Middle Value
-  Parent: Outer Value
-  Global: Global Value
-Inner Scope:
-  Local: Inner Value
-  Parent: Middle Value
-  Grandparent: Outer Value
-  Global: Global Value
+5.0 100

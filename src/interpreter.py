@@ -9,6 +9,16 @@ import math
 class BreakStatement:
     pass
 
+class SemanticError(Exception):
+    def __init__(self, message, line=None, column=None):
+        self.message = message
+        self.line = line
+        self.column = column
+
+    def __str__(self):
+        location = f" at line {self.line}, column {self.column}" if self.line is not None else ""
+        return f"❌ Semantic Error{location}:\n❌ {self.message}"
+
 class FunctionReturn(Exception):
     def __init__(self, value):
         self.value = value
@@ -72,24 +82,39 @@ class Interpreter(EnglishLangParserVisitor):
                 self.output_lines.append(str(result))
         return self.output_lines
 
-    def visitVariableDeclaration(self, ctx):
+
+    def visitVariableDeclarationOrAssignment(self, ctx):
         name = ctx.IDENTIFIER().getText()
         value = self.visit(ctx.expression())
+
+        is_declaration = ctx.SET() is not None
         type_ctx = ctx.typeAnnotation()
         declared_type = type_ctx.getText().lower() if type_ctx else None
 
-        if declared_type:
-            value = self.cast_value(value, declared_type)
-
+        if is_declaration:
             if self.current_scope.has_variable(name):
-                raise Exception(f"Variable '{name}' already declared in this scope.")
+                # 🔥 Get line and column info
+                token = ctx.IDENTIFIER().getSymbol()
+                raise SemanticError(f"Variable '{name}' already declared in this scope.",
+                                    line=token.line, column=token.column)
+
+            if declared_type:
+                value = self.cast_value(value, declared_type)
 
             self.current_scope.set_variable(name, value)
         else:
-            # No type = assignment; assign to existing variable or current scope
-            self.set_var(name, value)
+            if declared_type:
+                value = self.cast_value(value, declared_type)
+
+            try:
+                self.set_var(name, value)
+            except Exception:
+                token = ctx.IDENTIFIER().getSymbol()
+                raise SemanticError(f"Cannot assign to undeclared variable '{name}'. Use 'Set' to declare.",
+                                    line=token.line, column=token.column)
 
         return None
+
     
     def lookup_variable(self, name):
         return self.current_scope.get_variable(name)
@@ -97,22 +122,38 @@ class Interpreter(EnglishLangParserVisitor):
     def visitFunctionDeclaration(self, ctx):
         name = ctx.IDENTIFIER().getText()
         param_list = []
+        seen_params = set()
+
+        if name in self.functions:
+            token = ctx.IDENTIFIER().getSymbol()
+            raise SemanticError(
+                f"Function '{name}' is already defined.",
+                line=token.line,
+                column=token.column
+            )
 
         if ctx.parameter():
             for typed_param in ctx.parameter().typedParameter():
                 param_name = typed_param.IDENTIFIER().getText()
+
+                if param_name in seen_params:
+                    token = typed_param.IDENTIFIER().getSymbol()
+                    raise SemanticError(f"Duplicate parameter name '{param_name}' in function '{name}'",
+                                        line=token.line, column=token.column)
+
+                seen_params.add(param_name)
                 param_list.append(param_name)
 
         body = ctx.blockStatement()
         self.functions[name] = {
             "params": param_list,
             "body": body,
-            "scope": self.current_scope
+            "scope": self.current_scope  
         }
         return None
 
     def visitFunctionCall(self, ctx):
-        print("New visitFunctionCall reached")
+        #print("New visitFunctionCall reached")
 
         func_name = ctx.IDENTIFIER().getText()
         args = []
@@ -122,7 +163,7 @@ class Interpreter(EnglishLangParserVisitor):
                 arg_val = self.visit(expr)
                 args.append(arg_val)
 
-        print(f"Calling function: {func_name} with args: {args}")
+        #print(f"Calling function: {func_name} with args: {args}")
         result = self.callFunction(func_name, args)
         return result        
 
@@ -133,7 +174,9 @@ class Interpreter(EnglishLangParserVisitor):
         defining_scope = func["scope"]
 
         if len(param_names) != len(args):
-            raise Exception(f"Function '{name}' expects {len(param_names)} args, got {len(args)}")
+            raise SemanticError(
+                f"Function '{name}' expects {len(param_names)} argument(s), but got {len(args)} instead."
+            )
 
         local_scope = Scope(parent=defining_scope)
 
@@ -220,7 +263,7 @@ class Interpreter(EnglishLangParserVisitor):
         result = self.visitChildren(ctx)
 
         if ctx.functionCall() and result is not None:
-            print("DEBUG: Standalone function call result:", result)
+            #print("DEBUG: Standalone function call result:", result)
             self.output_lines.append(f"Result: {result}")
 
         return result
@@ -385,7 +428,7 @@ class Interpreter(EnglishLangParserVisitor):
         for rowCtx in ctx.row():
             row = [self.visit(value) for value in rowCtx.value()]
             rows.append(row)
-            print("DEBUG row:", row)
+            #print("DEBUG row:", row)
         return rows
 
     def visitValue(self, ctx):

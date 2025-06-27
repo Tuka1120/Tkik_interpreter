@@ -10,7 +10,7 @@ sys.path.append(grammar_path)
 from EnglishLangLexer import EnglishLangLexer
 from EnglishLangParser import EnglishLangParser
 from errorlistener import EnglishLangErrorListener
-from interpreter import Interpreter
+from interpreter import Interpreter, SemanticError
 
 def main():
     input_file_path = os.path.join(os.path.dirname(__file__), 'input_code.txt')
@@ -35,8 +35,13 @@ def main():
         tree = parser.program()
         visitor = Interpreter()
         output = visitor.visit(tree)
+
     except SyntaxError as e:
         print(e)
+        return
+
+    except SemanticError as se:
+        print(se)
         return
     
     with open(output_path, 'w', encoding='utf-8') as out_file:

@@ -24,8 +24,8 @@ class EnglishLangParserVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by EnglishLangParser#variableDeclaration.
-    def visitVariableDeclaration(self, ctx:EnglishLangParser.VariableDeclarationContext):
+    # Visit a parse tree produced by EnglishLangParser#variableDeclarationOrAssignment.
+    def visitVariableDeclarationOrAssignment(self, ctx:EnglishLangParser.VariableDeclarationOrAssignmentContext):
         return self.visitChildren(ctx)
 
 

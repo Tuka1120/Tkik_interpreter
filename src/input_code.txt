@@ -1,40 +1,13 @@
 Start Program
-    Set globalVar to "Global Value" string
-    
-    Define Function outerFunction() {
-        Set outerVar to "Outer Value" string
+
+    Set x to 100 int
+
+    Define Function foo (x){
         
-        Define Function middleFunction() {
-            Set middleVar to "Middle Value" string
-            
-            Define Function innerFunction() {
-                Set innerVar to "Inner Value" string
-                
-                // Access variables from different scopes
-                Display "Inner Scope:"
-                Display "  Local:", innerVar
-                Display "  Parent:", parent::middleVar
-                Display "  Grandparent:", parent::parent::outerVar
-                Display "  Global:", parent::parent::parent::globalVar
-            } End Function
-            
-            Display "\nMiddle Scope:"
-            Display "  Local:", middleVar
-            Display "  Parent:", parent::outerVar
-            Display "  Global:", parent::parent::globalVar
-            
-            Call innerFunction()
-        } End Function
-        
-        Display "\nOuter Scope:"
-        Display "  Local:", outerVar
-        Display "  Global:", parent::globalVar
-        
-        Call middleFunction()
-    } End Function
-    
-    Display "Global Scope:"
-    Display "  Global:", globalVar
-    
-    Call outerFunction()
+        Display x, parent::parent::x
+    }
+    End Function
+
+    foo (5)
+
 End Program

@@ -7,7 +7,7 @@ program : START_PROGRAM statement+ END_PROGRAM ;
 
 // Statements
 statement: 
-      variableDeclaration
+      variableDeclarationOrAssignment
     | reassignment
     | functionDeclaration
     | functionCall
@@ -23,7 +23,7 @@ statement:
 
 loopStatements:
       loopStatement
-    | variableDeclaration
+    | variableDeclarationOrAssignment
     | reassignment
     | functionDeclaration
     | returnStatement
@@ -34,10 +34,11 @@ loopStatements:
     ;
 
 
-// Variable Declaration & Assignment
-variableDeclaration
-    : SET? IDENTIFIER TO expression typeAnnotation?
+variableDeclarationOrAssignment
+    : SET IDENTIFIER TO expression typeAnnotation?    // declaration
+    | IDENTIFIER TO expression                        // reassignment
     ;
+
 
 matrixExpression: (INVERT_MATRIX)? matrixAtom (TRANSPOSITION)?;
 matrixAtom: IDENTIFIER | matrixConstruction;
@@ -124,11 +125,11 @@ forLoop
 
 forInit
     : IDENTIFIER
-    | variableDeclaration
+    | variableDeclarationOrAssignment
     ;
 
 forUpdate
-    : variableDeclaration
+    : variableDeclarationOrAssignment
     | reassignment
     | operation
     ;
