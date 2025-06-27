@@ -52,9 +52,13 @@ class Interpreter(EnglishLangParserVisitor):
         self.functions = {}        
         self.output_lines = []
         self.call_stack = []
+        self.skip_next_block_scope = False
 
-    def push_env(self):
-        self.current_scope = Scope(parent=self.current_scope)
+    def push_env(self, new_scope=None):
+        if new_scope:
+            self.current_scope = new_scope
+        else:
+            self.current_scope = Scope(parent=self.current_scope)
 
     def pop_env(self):
         if self.current_scope.parent:
@@ -170,7 +174,7 @@ class Interpreter(EnglishLangParserVisitor):
     def callFunction(self, name, args):
         func = self.functions[name]
         param_names = func["params"]
-        body = func["body"]
+        func_body = func["body"]
         defining_scope = func["scope"]
 
         if len(param_names) != len(args):
@@ -178,25 +182,25 @@ class Interpreter(EnglishLangParserVisitor):
                 f"Function '{name}' expects {len(param_names)} argument(s), but got {len(args)} instead."
             )
 
-        local_scope = Scope(parent=defining_scope)
+        # Create a single scope: child of defining scope
+        call_scope = Scope(parent=defining_scope)
 
-        for pname, arg in zip(param_names, args):
-            local_scope.set_variable(pname, arg)
+        # Bind parameters directly in call_scope
+        for param_name, arg_value in zip(param_names, args):
+            call_scope.set_variable(param_name, arg_value)
 
-        previous_scope = self.current_scope
-        self.current_scope = local_scope
+        # Push this scope
+        self.skip_next_block_scope = True
+        self.push_env(call_scope)
 
         try:
-            self.visit(body)
-        except FunctionReturn as fr:
-            return_value = fr.value
-        else:
-            return_value = None
-        finally:
-            self.current_scope = previous_scope
+            self.visit(func_body)
+        except FunctionReturn as rv:
+            self.pop_env()  # call_scope
+            return rv.value
 
-        print(f"Function {name} returned: {return_value}")
-        return return_value
+        self.pop_env()  # call_scope
+
     
     def visitBuiltInFunctions(self, ctx):
         if ctx.POWER_FUNC():
@@ -249,12 +253,18 @@ class Interpreter(EnglishLangParserVisitor):
         return value
     
     def visitBlockStatement(self, ctx):
-        self.push_env()
+        skip_scope = self.skip_next_block_scope
+        self.skip_next_block_scope = False
+
+        if not skip_scope:
+            self.push_env()
+
         for stmt in ctx.statement():
             self.visit(stmt)
-        self.pop_env()
 
-    
+        if not skip_scope:
+            self.pop_env()
+        
     def visitReturnStatement(self, ctx):
         value = self.visit(ctx.expression())
         raise FunctionReturn(value)

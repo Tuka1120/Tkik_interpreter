@@ -1,13 +1,13 @@
 Start Program
 
-    Set x to 100 int
+Set a to 1 int
+{
+    Set a to 2 int
+    {
+        a to 5
 
-    Define Function foo (x){
-        
-        Display x, parent::parent::x
+        Display a, parent::a, parent::parent::a
     }
-    End Function
-
-    foo (5)
+}
 
 End Program
