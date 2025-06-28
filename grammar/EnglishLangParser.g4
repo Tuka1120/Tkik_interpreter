@@ -27,7 +27,7 @@ loopStatements:
     | reassignment
     | functionDeclaration
     | returnStatement
-    | loopIfStatement
+    | ifStatement
     | blockStatement
     | BREAK
     | displayStatement
@@ -35,8 +35,8 @@ loopStatements:
 
 
 variableDeclarationOrAssignment
-    : SET IDENTIFIER TO expression typeAnnotation?    // declaration
-    | IDENTIFIER TO expression                        // reassignment
+    : SET (scopedIdentifier | IDENTIFIER) TO expression typeAnnotation?    // declaration
+    | (scopedIdentifier | IDENTIFIER) TO expression                        // reassignment
     ;
 
 
@@ -109,11 +109,6 @@ builtInFunctions:POWER_FUNC LPAREN numExpression COMMA numExpression RPAREN
 ifStatement: IF LPAREN boolExpression RPAREN (statement | blockStatement)
              (ELSE_IF LPAREN boolExpression RPAREN (statement | blockStatement))*
              (ELSE (statement | blockStatement))?;
-loopIfStatement: IF LPAREN boolExpression RPAREN (LBRACE loopStatements+ RBRACE | statement)
-
-             (ELSE_IF LPAREN boolExpression RPAREN (LBRACE loopStatements+ RBRACE | statement))*
-
-             (ELSE (LBRACE loopStatements+ RBRACE | statement))?;
 
 loopStatement: forLoop | whileLoop;
 

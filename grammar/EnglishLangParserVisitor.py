@@ -114,11 +114,6 @@ class EnglishLangParserVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by EnglishLangParser#loopIfStatement.
-    def visitLoopIfStatement(self, ctx:EnglishLangParser.LoopIfStatementContext):
-        return self.visitChildren(ctx)
-
-
     # Visit a parse tree produced by EnglishLangParser#loopStatement.
     def visitLoopStatement(self, ctx:EnglishLangParser.LoopStatementContext):
         return self.visitChildren(ctx)

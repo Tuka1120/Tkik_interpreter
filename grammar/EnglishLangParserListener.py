@@ -197,15 +197,6 @@ class EnglishLangParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by EnglishLangParser#loopIfStatement.
-    def enterLoopIfStatement(self, ctx:EnglishLangParser.LoopIfStatementContext):
-        pass
-
-    # Exit a parse tree produced by EnglishLangParser#loopIfStatement.
-    def exitLoopIfStatement(self, ctx:EnglishLangParser.LoopIfStatementContext):
-        pass
-
-
     # Enter a parse tree produced by EnglishLangParser#loopStatement.
     def enterLoopStatement(self, ctx:EnglishLangParser.LoopStatementContext):
         pass

@@ -86,36 +86,48 @@ class Interpreter(EnglishLangParserVisitor):
                 self.output_lines.append(str(result))
         return self.output_lines
 
-
     def visitVariableDeclarationOrAssignment(self, ctx):
-        name = ctx.IDENTIFIER().getText()
-        value = self.visit(ctx.expression())
-
         is_declaration = ctx.SET() is not None
         type_ctx = ctx.typeAnnotation()
         declared_type = type_ctx.getText().lower() if type_ctx else None
 
+        # Determine if it's scopedIdentifier or simple IDENTIFIER
+        if ctx.scopedIdentifier():
+            levels = len(ctx.scopedIdentifier().getTokens(EnglishLangParser.PARENT_SCOPE))
+            name = ctx.scopedIdentifier().IDENTIFIER().getText()
+            target_scope = self.current_scope
+            for _ in range(levels):
+                if not target_scope.parent:
+                    token = ctx.scopedIdentifier().IDENTIFIER().getSymbol()
+                    raise SemanticError(f"No parent scope exists for assignment to 'parent::{'::' * levels}{name}'",
+                                        line=token.line, column=token.column)
+                target_scope = target_scope.parent
+        else:
+            name = ctx.IDENTIFIER().getText()
+            target_scope = self.current_scope
+
+        value = self.visit(ctx.expression())
+        if declared_type:
+            value = self.cast_value(value, declared_type)
+
         if is_declaration:
-            if self.current_scope.has_variable(name):
-                # 🔥 Get line and column info
-                token = ctx.IDENTIFIER().getSymbol()
+            if target_scope.has_variable(name):
+                token = ctx.IDENTIFIER().getSymbol() if ctx.IDENTIFIER() else ctx.scopedIdentifier().IDENTIFIER().getSymbol()
                 raise SemanticError(f"Variable '{name}' already declared in this scope.",
                                     line=token.line, column=token.column)
-
-            if declared_type:
-                value = self.cast_value(value, declared_type)
-
-            self.current_scope.set_variable(name, value)
+            target_scope.set_variable(name, value)
         else:
-            if declared_type:
-                value = self.cast_value(value, declared_type)
+            # Assignment (must already exist in target scope or parent)
+            scope = target_scope
+            while scope:
+                if scope.has_variable(name):
+                    scope.set_variable(name, value)
+                    return None
+                scope = scope.parent
 
-            try:
-                self.set_var(name, value)
-            except Exception:
-                token = ctx.IDENTIFIER().getSymbol()
-                raise SemanticError(f"Cannot assign to undeclared variable '{name}'. Use 'Set' to declare.",
-                                    line=token.line, column=token.column)
+            token = ctx.IDENTIFIER().getSymbol() if ctx.IDENTIFIER() else ctx.scopedIdentifier().IDENTIFIER().getSymbol()
+            raise SemanticError(f"Cannot assign to undeclared variable '{name}'. Use 'Set' to declare.",
+                                line=token.line, column=token.column)
 
         return None
 
@@ -233,23 +245,53 @@ class Interpreter(EnglishLangParserVisitor):
 
     def visitIdentifier(self, ctx):
         var_name = ctx.getText()
-        if var_name in self.variables:
-            return self.variables[var_name]
-        else:
-            raise Exception(f"Undefined variable: {var_name}")
-        
+
+        # ⛔ Fail early if variable not declared in *current* scope
+        if not self.current_scope.has_variable(var_name):
+            # 🔍 Check if variable exists in parent (user meant parent::a but wrote just a)
+            if self.current_scope.parent and self.current_scope.parent.has_variable(var_name):
+                # 💥 THIS IS THE BUG YOU'RE EXPERIENCING: Fallback silently to parent scope
+                # We should NOT fallback. Instead, this is a semantic error.
+                token = ctx.start
+                raise SemanticError(
+                    f"Variable '{var_name}' is not declared in the current scope. "
+                    f"Did you mean 'parent::{var_name}'?",
+                    line=token.line,
+                    column=token.column
+                )
+            else:
+                token = ctx.start
+                raise SemanticError(
+                    f"Variable '{var_name}' is not declared in the current scope.",
+                    line=token.line,
+                    column=token.column
+                )
+
+        return self.current_scope.get_variable(var_name)
+
     def visitScopedIdentifier(self, ctx):
         levels = len(ctx.getTokens(EnglishLangParser.PARENT_SCOPE))
         name = ctx.IDENTIFIER().getText()
+        token = ctx.IDENTIFIER().getSymbol()
+
         current_scope = self.current_scope
         for _ in range(levels):
             if current_scope.parent is None:
-                raise Exception(f"No parent scope exists while resolving 'parent::{name}'")
+                raise SemanticError(
+                    f"Too many 'parent::' levels when accessing variable '{name}'",
+                    line=token.line,
+                    column=token.column
+                )
             current_scope = current_scope.parent
 
-        value = current_scope.get_variable(name)
-        if value is None:
-            raise Exception(f"Variable '{name}' not found in the specified parent scope")
+        try:
+            value = current_scope.get_variable(name)
+        except Exception:
+            raise SemanticError(
+                f"Variable '{name}' not found in the specified parent scope",
+                line=token.line,
+                column=token.column
+            )
         return value
     
     def visitBlockStatement(self, ctx):
@@ -533,51 +575,26 @@ class Interpreter(EnglishLangParserVisitor):
 
         return None
 
-
-    def visitLoopIfStatement(self, ctx):
-        if self.visit(ctx.boolExpression(0)):
-            if ctx.loopStatements(0):
-                return self.visit(ctx.loopStatements(0))
-            elif ctx.statement(0):
-                return self.visit(ctx.statement(0))
-
-        for i in range(1, len(ctx.boolExpression())):
-            if self.visit(ctx.boolExpression(i)):
-                if ctx.loopStatements(i):
-                    return self.visit(ctx.loopStatements(i))
-                elif ctx.statement(i):
-                    return self.visit(ctx.statement(i))
-
-        if ctx.ELSE(): 
-            idx = len(ctx.boolExpression())
-            if len(ctx.loopStatements()) > idx:
-                return self.visit(ctx.loopStatements(idx))
-            elif len(ctx.statement()) > idx:
-                return self.visit(ctx.statement(idx))
-
-        return None
-
     def visitBreakStatement(self, ctx):
         return BreakStatement()
     
     def visitLoopStatements(self, ctx):
         if ctx.loopStatement():
             return self.visit(ctx.loopStatement())
-        elif ctx.variableDeclaration():
-            return self.visit(ctx.variableDeclaration())
+        elif ctx.variableDeclarationOrAssignment():
+            return self.visit(ctx.variableDeclarationOrAssignment())
         elif ctx.reassignment():
             return self.visit(ctx.reassignment())
         elif ctx.functionDeclaration():
             return self.visit(ctx.functionDeclaration())
         elif ctx.returnStatement():
             return self.visit(ctx.returnStatement())
-        elif ctx.loopIfStatement():
-            return self.visit(ctx.loopIfStatement())
+        elif ctx.ifStatement():
+            return self.visit(ctx.ifStatement())
         elif ctx.blockStatement():
             return self.visit(ctx.blockStatement())
         elif ctx.displayStatement():
             return self.visit(ctx.displayStatement())
-
 
     def visitWhileLoop(self, ctx):
         while self.visit(ctx.boolExpression()):
