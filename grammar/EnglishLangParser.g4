@@ -8,7 +8,6 @@ program : START_PROGRAM statement+ END_PROGRAM ;
 // Statements
 statement: 
       variableDeclarationOrAssignment
-    | reassignment
     | functionDeclaration
     | functionCall
     | returnStatement
@@ -24,7 +23,6 @@ statement:
 loopStatements:
       loopStatement
     | variableDeclarationOrAssignment
-    | reassignment
     | functionDeclaration
     | returnStatement
     | ifStatement
@@ -125,7 +123,6 @@ forInit
 
 forUpdate
     : variableDeclarationOrAssignment
-    | reassignment
     | operation
     ;
 
@@ -164,12 +161,6 @@ factor
     ;
 
 operation : IDENTIFIER (INCREMENT | DECREMENT) SEMICOLON? ;
-
-reassignment: IDENTIFIER ((ADD_TO STRING | ADD_TO numExpression)
-                          | SUBTRACT_FROM numExpression
-                          | DIVIDE_FROM numExpression
-                          | TIMES numExpression)
-               SEMICOLON;
 
 boolExpression
     : boolOrExpression

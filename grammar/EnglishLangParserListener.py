@@ -386,15 +386,6 @@ class EnglishLangParserListener(ParseTreeListener):
         pass
 
 
-    # Enter a parse tree produced by EnglishLangParser#reassignment.
-    def enterReassignment(self, ctx:EnglishLangParser.ReassignmentContext):
-        pass
-
-    # Exit a parse tree produced by EnglishLangParser#reassignment.
-    def exitReassignment(self, ctx:EnglishLangParser.ReassignmentContext):
-        pass
-
-
     # Enter a parse tree produced by EnglishLangParser#boolExpression.
     def enterBoolExpression(self, ctx:EnglishLangParser.BoolExpressionContext):
         pass

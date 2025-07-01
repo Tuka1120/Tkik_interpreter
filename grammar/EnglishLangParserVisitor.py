@@ -219,11 +219,6 @@ class EnglishLangParserVisitor(ParseTreeVisitor):
         return self.visitChildren(ctx)
 
 
-    # Visit a parse tree produced by EnglishLangParser#reassignment.
-    def visitReassignment(self, ctx:EnglishLangParser.ReassignmentContext):
-        return self.visitChildren(ctx)
-
-
     # Visit a parse tree produced by EnglishLangParser#boolExpression.
     def visitBoolExpression(self, ctx:EnglishLangParser.BoolExpressionContext):
         return self.visitChildren(ctx)

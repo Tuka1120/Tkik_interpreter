@@ -25,22 +25,31 @@ class FunctionReturn(Exception):
 
 class Scope:
     def __init__(self, parent=None):
-        self.variables = {}
+        self.variables = {}  # map: name -> {"value": ..., "type": ...}
         self.parent = parent
 
-    def set_variable(self, name, value):
-        self.variables[name] = value
+    def set_variable(self, name, value, var_type=None):
+        self.variables[name] = {"value": value, "type": var_type}
 
     def has_variable(self, name):
         return name in self.variables
 
     def get_variable(self, name):
         if name in self.variables:
-            return self.variables[name]
+            return self.variables[name]["value"]
         elif self.parent:
             return self.parent.get_variable(name)
         else:
             raise Exception(f"Variable '{name}' not found in any scope")
+
+    def get_variable_type(self, name):
+        if name in self.variables:
+            return self.variables[name]["type"]
+        elif self.parent:
+            return self.parent.get_variable_type(name)
+        else:
+            return None
+
 
 class Interpreter(EnglishLangParserVisitor):
     def __init__(self):
@@ -56,15 +65,30 @@ class Interpreter(EnglishLangParserVisitor):
 
     def push_env(self, new_scope=None):
         if new_scope:
+            new_scope.parent = self.current_scope
             self.current_scope = new_scope
         else:
             self.current_scope = Scope(parent=self.current_scope)
+        #print("DEBUG: PUSH — scope now at depth", self.scope_depth())
 
     def pop_env(self):
         if self.current_scope.parent:
+            #print("DEBUG: POP — scope now at depth", self.scope_depth() - 1)
             self.current_scope = self.current_scope.parent
         else:
             raise Exception("Cannot pop global scope")
+        
+        #if self.scope_depth() == 1:
+            #print("DEBUG: At global scope again")
+
+
+    def scope_depth(self):
+        depth = 0
+        scope = self.current_scope
+        while scope:
+            depth += 1
+            scope = scope.parent
+        return depth
 
     def set_var(self, name, value):
         scope = self.current_scope
@@ -106,28 +130,31 @@ class Interpreter(EnglishLangParserVisitor):
             name = ctx.IDENTIFIER().getText()
             target_scope = self.current_scope
 
+
         value = self.visit(ctx.expression())
-        if declared_type:
-            value = self.cast_value(value, declared_type)
 
         if is_declaration:
+            if declared_type:
+                value = self.cast_value(value, declared_type)
             if target_scope.has_variable(name):
-                token = ctx.IDENTIFIER().getSymbol() if ctx.IDENTIFIER() else ctx.scopedIdentifier().IDENTIFIER().getSymbol()
-                raise SemanticError(f"Variable '{name}' already declared in this scope.",
-                                    line=token.line, column=token.column)
-            target_scope.set_variable(name, value)
+                # error handling
+                pass
+            target_scope.set_variable(name, value, declared_type)
         else:
-            # Assignment (must already exist in target scope or parent)
+            # reassignment: find the variable's declared type from scope chain
             scope = target_scope
+            var_type = None
             while scope:
                 if scope.has_variable(name):
-                    scope.set_variable(name, value)
+                    var_type = scope.get_variable_type(name)
+                    if var_type:
+                        value = self.cast_value(value, var_type)
+                    scope.set_variable(name, value, var_type)
                     return None
                 scope = scope.parent
 
-            token = ctx.IDENTIFIER().getSymbol() if ctx.IDENTIFIER() else ctx.scopedIdentifier().IDENTIFIER().getSymbol()
-            raise SemanticError(f"Cannot assign to undeclared variable '{name}'. Use 'Set' to declare.",
-                                line=token.line, column=token.column)
+            # if not found: error handling
+            pass
 
         return None
 
@@ -158,15 +185,21 @@ class Interpreter(EnglishLangParserVisitor):
                                         line=token.line, column=token.column)
 
                 seen_params.add(param_name)
-                param_list.append(param_name)
+
+                # Extract type string here
+                type_ctx = typed_param.typeAnnotation()
+                param_type = type_ctx.getText().lower() if type_ctx else None
+
+                param_list.append((param_name, param_type))  # Store tuple of (name, type)
 
         body = ctx.blockStatement()
         self.functions[name] = {
-            "params": param_list,
+            "params": param_list,   # Now a list of (name, type)
             "body": body,
             "scope": self.current_scope  
         }
         return None
+
 
     def visitFunctionCall(self, ctx):
         #print("New visitFunctionCall reached")
@@ -185,35 +218,33 @@ class Interpreter(EnglishLangParserVisitor):
 
     def callFunction(self, name, args):
         func = self.functions[name]
-        param_names = func["params"]
+        param_info = func["params"]   # List of (name, type)
         func_body = func["body"]
         defining_scope = func["scope"]
 
-        if len(param_names) != len(args):
+        if len(param_info) != len(args):
             raise SemanticError(
-                f"Function '{name}' expects {len(param_names)} argument(s), but got {len(args)} instead."
+                f"Function '{name}' expects {len(param_info)} argument(s), but got {len(args)} instead."
             )
 
-        # Create a single scope: child of defining scope
         call_scope = Scope(parent=defining_scope)
 
-        # Bind parameters directly in call_scope
-        for param_name, arg_value in zip(param_names, args):
-            call_scope.set_variable(param_name, arg_value)
+        for (param_name, param_type), arg_value in zip(param_info, args):
+            # Cast argument value to the declared param_type
+            casted_value = self.cast_value(arg_value, param_type) if param_type else arg_value
+            call_scope.set_variable(param_name, casted_value)
 
-        # Push this scope
-        self.skip_next_block_scope = True
         self.push_env(call_scope)
+        self.skip_next_block_scope = True
 
         try:
             self.visit(func_body)
         except FunctionReturn as rv:
-            self.pop_env()  # call_scope
+            self.pop_env()
             return rv.value
 
-        self.pop_env()  # call_scope
+        self.pop_env()
 
-    
     def visitBuiltInFunctions(self, ctx):
         if ctx.POWER_FUNC():
             base = self.visit(ctx.numExpression(0))
@@ -246,12 +277,8 @@ class Interpreter(EnglishLangParserVisitor):
     def visitIdentifier(self, ctx):
         var_name = ctx.getText()
 
-        # ⛔ Fail early if variable not declared in *current* scope
         if not self.current_scope.has_variable(var_name):
-            # 🔍 Check if variable exists in parent (user meant parent::a but wrote just a)
             if self.current_scope.parent and self.current_scope.parent.has_variable(var_name):
-                # 💥 THIS IS THE BUG YOU'RE EXPERIENCING: Fallback silently to parent scope
-                # We should NOT fallback. Instead, this is a semantic error.
                 token = ctx.start
                 raise SemanticError(
                     f"Variable '{var_name}' is not declared in the current scope. "
@@ -295,18 +322,17 @@ class Interpreter(EnglishLangParserVisitor):
         return value
     
     def visitBlockStatement(self, ctx):
-        skip_scope = self.skip_next_block_scope
-        self.skip_next_block_scope = False
+        if self.skip_next_block_scope:
+            self.skip_next_block_scope = False  # reset the flag
+            for stmt in ctx.statement():
+                self.visit(stmt)
+            return  # DO NOT push/pop
 
-        if not skip_scope:
-            self.push_env()
-
+        self.push_env()
         for stmt in ctx.statement():
             self.visit(stmt)
+        self.pop_env()
 
-        if not skip_scope:
-            self.pop_env()
-        
     def visitReturnStatement(self, ctx):
         value = self.visit(ctx.expression())
         raise FunctionReturn(value)
@@ -319,21 +345,6 @@ class Interpreter(EnglishLangParserVisitor):
             self.output_lines.append(f"Result: {result}")
 
         return result
-
-    def visitReassignment(self, ctx):
-        name = ctx.IDENTIFIER().getText()
-        if name not in self.variables:
-            raise Exception(f"Variable '{name}' not defined.")
-        value = self.visit(ctx.numExpression())
-        if ctx.ADD_TO():
-            self.variables[name] += value
-        elif ctx.SUBTRACT_FROM():
-            self.variables[name] -= value
-        elif ctx.TIMES():
-            self.variables[name] *= value
-        elif ctx.DIVIDE_FROM():
-            self.variables[name] /= value
-        return self.variables[name]
 
     def visitDisplayStatement(self, ctx):
         expressions = ctx.expression()
@@ -381,7 +392,12 @@ class Interpreter(EnglishLangParserVisitor):
         return -self.visit(ctx.factor())
 
     def visitFactorNumber(self, ctx):
-        return float(ctx.NUMBER().getText())
+        text = ctx.NUMBER().getText()
+        if '.' in text:
+            return float(text)
+        else:
+            return int(text)
+
 
     def visitFactorIdentifier(self, ctx):
         name = ctx.IDENTIFIER().getText()
@@ -485,7 +501,11 @@ class Interpreter(EnglishLangParserVisitor):
 
     def visitValue(self, ctx):
         if ctx.NUMBER():
-            return float(ctx.NUMBER().getText())
+            text = ctx.NUMBER().getText()
+            if '.' in text:
+                return float(text)
+            else:
+                return int(text)
         elif ctx.IDENTIFIER():
             value = self.lookup_variable(ctx.IDENTIFIER().getText())
             if isinstance(value, list) and any(isinstance(row, list) for row in value):
@@ -519,7 +539,6 @@ class Interpreter(EnglishLangParserVisitor):
             raise Exception("Invalid matrix format")
         else:
             raise Exception(f"Unknown type: {type_str}")
-
 
     def visitBoolExpression(self, ctx):
         return self.visitChildren(ctx)
@@ -583,8 +602,6 @@ class Interpreter(EnglishLangParserVisitor):
             return self.visit(ctx.loopStatement())
         elif ctx.variableDeclarationOrAssignment():
             return self.visit(ctx.variableDeclarationOrAssignment())
-        elif ctx.reassignment():
-            return self.visit(ctx.reassignment())
         elif ctx.functionDeclaration():
             return self.visit(ctx.functionDeclaration())
         elif ctx.returnStatement():
